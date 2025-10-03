@@ -351,6 +351,9 @@ nav a.active {
   }
 }
 
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 .about-container {
   max-width: 900px;
   margin: 0 auto;
@@ -363,6 +366,21 @@ nav a.active {
   margin-top: 2rem;
 }
 
+.service-card {
+  padding: 2rem;
+  border: 2px solid #4a90e2;
+  border-radius: 12px;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+}
+
+.service-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
 .about-text h2 {
   color: #4a90e2;
   margin-top: 1.5rem;
