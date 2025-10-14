@@ -2,12 +2,15 @@ import { useState } from "react";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const Opret = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
     const [error, setError] = useState("");
+
+    const navigate = useNavigate();
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -25,7 +28,9 @@ const Opret = () => {
 
             });
         
-         console.log("Bruger oprettet ✅"); } catch (err) {
+         console.log("Bruger oprettet ✅"); 
+         navigate("/", { replace: true });
+        } catch (err) {
                 setError(err.message);
                 }
     };

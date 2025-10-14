@@ -23,3 +23,5 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);      // Database (Firestore)
 export const auth = getAuth(app);         // Login/signup
 export const storage = getStorage(app);   // Upload billeder, covers osv.
+
+console.log("🔥 Firebase config loaded:", firebaseConfig);
