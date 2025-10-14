@@ -64,7 +64,7 @@ export default function Login() {
 
       <p>
         Har du ikke en konto?{" "}
-        <a href="/opret" style={{ textDecoration: "underline" }}>
+        <a href="/signup" style={{ textDecoration: "underline" }}>
           Tilmeld dig her
         </a>
       </p>
