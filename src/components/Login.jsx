@@ -44,7 +44,7 @@ export default function Login() {
       <h2>Log på “app-navn”</h2>
       <form onSubmit={handleLogin}>
         <input
-          type="email"
+          type="text"
           placeholder="E-mailadresse eller brugernavn"
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
