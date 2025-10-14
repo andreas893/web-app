@@ -1,8 +1,13 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+
+
 import LandingPage from "./pages/landingPage";
 import Login from "./components/Login";
 import Opret from "./components/Opret";
 import ProtectedRoute from "./components/ProtectedRoute";
+
+
+
 
 export default function App() {
   return (
