@@ -1,10 +1,8 @@
-import { Routes, Route, Navigate } from "react-router";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Nav from "./components/Nav";
-import HomePage from "./pages/HomePage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
-import Footer from "./components/Footer";
-import ServicesPage from "./pages/ServicesPage";
+import Login from "./pages/Login";
+import Opret from "./pages/Opret";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -13,9 +11,22 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<Landingpage />} />
+          
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Opret />} />
+
+           <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <LandingPage />
+              </ProtectedRoute>
+            }
+          />
+
+           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
-      <Footer />
     </>
   );
 }
