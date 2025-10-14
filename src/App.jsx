@@ -1,5 +1,9 @@
 import { Routes, Route, Navigate } from "react-router";
-import LandingPage from "./pages/LandinPage";
+import LandingPage from "./pages/landingpage";
+
+import Login from "./components/Login";
+import Opret from "./components/Opret";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -10,26 +14,11 @@ export default function App() {
 
         {/* Hvis man går et forkert sted hen, send brugeren hjem */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </main>
-import { Routes, Route, Navigate } from "react-router-dom";
-import Nav from "./components/Nav";
-import Login from "./pages/Login";
-import Opret from "./pages/Opret";
-import ProtectedRoute from "./components/ProtectedRoute";
 
-export default function App() {
-  return (
-    <>
-      <Nav />
-      <main>
-        <Routes>
-          <Route path="/" element={<Landingpage />} />
-          
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Opret />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Opret />} />
 
-           <Route
+        <Route
             path="/"
             element={
               <ProtectedRoute>
@@ -37,10 +26,9 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+      </Routes>
+    </main>
 
-           <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </main>
-    </>
   );
-}
+};
+
