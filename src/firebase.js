@@ -6,14 +6,14 @@ import { getStorage } from "firebase/storage";
 
 // Din Firebase konfiguration (den du allerede har)
 const firebaseConfig = {
-  apiKey: "AIzaSyBKCV65Rm9U1V5Y-Xkul5fBSGIi3zLnmU8",
-  authDomain: "web-app-de082.firebaseapp.com",
-  databaseURL: "https://web-app-de082-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "web-app-de082",
-  storageBucket: "web-app-de082.firebasestorage.app",
-  messagingSenderId: "890577631951",
-  appId: "1:890577631951:web:32b4698fbbcf3a791a95ba",
-  measurementId: "G-9WX20YNPK6",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialiser Firebase
