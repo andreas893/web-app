@@ -17,7 +17,7 @@ const Opret = () => {
 
             await setDoc(doc(db, "users", user.uid),{
                 email: user.email,
-                username: username,
+                username: username.toLocaleLowerCase(),
                 createdAt: new Date(),
                 moods: [],
                 genres: [],
@@ -39,8 +39,8 @@ const Opret = () => {
       <h2>Opret konto</h2>
       <form onSubmit={handleSignup}>
          <input
-          type="email"
-          placeholder="E-mail"
+          type="text"
+          placeholder="Brugernavn"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
