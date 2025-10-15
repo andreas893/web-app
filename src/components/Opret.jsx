@@ -63,6 +63,7 @@ const Opret = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          autoComplete="new-password"
         />
         <button type="submit">Opret konto</button>
       </form>
