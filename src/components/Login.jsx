@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup, FacebookAuthProvider, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import "../login.css";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState(""); // kan være e-mail eller brugernavn
@@ -75,43 +76,62 @@ export default function Login() {
   return (
      <div className="login-page">
       
-      <h2>Log på “app-navn”</h2>
+      <div className="logo">
+         {/* <img src="" alt="" /> */}
+         <h2>Log på “app-navn”</h2>
+      </div>
+       
       
       {/* socials login */}
+      <div className="social-login">
+          <button onClick={handleSpotifyLogin} className="social-btn spotify">
+            <img src="/images/spotify.png" alt="spotify-logo" />
+            <p>Fortsæt med Spotify</p></button>
 
-      <button onClick={handleSpotifyLogin} className="social-btn spotify"><img src="../assets/images/spotify.png" alt="" />Fortsæt med Spotify</button>
-      <button onClick={handleGoogleLogin} className="social-btn google"><img src="../assets/images/google.png" alt="" />Fortsæt med Google</button>
-      <button onClick={handleFacebookLogin} className="social-btn facebook"><img src="../assets/images/facebook-01.png" alt="" />Fortsæt med Facebook</button>
+          <button onClick={handleGoogleLogin} className="social-btn google">
+          <img src="/images/google.png" alt="google-logo" />
+          <p>
+          Fortsæt med Google
+          </p></button>
+
+          <button onClick={handleFacebookLogin} className="social-btn facebook">
+            <img src="/images/facebook-01.png" alt="facebook-logo" />
+            <p>Fortsæt med Facebook</p></button>
+      </div>
+  
 
       <span className="line"></span>
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="E-mailadresse eller brugernavn"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Adgangskode"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="current-password"
-        />
-        <button type="submit">Log in</button>
-      </form>
+      <div className="username-login">
+         <form className="username-form" onSubmit={handleLogin}>
+          <input
+            type="text"
+            placeholder="E-mailadresse eller brugernavn"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Adgangskode"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+          />
+          <button type="submit">Log in</button>
+        </form>
 
-      {error && <p className="error">{error}</p>}
+        {error && <p className="error">{error}</p>}
 
-      <p>
-        Har du ikke en konto?{" "}
-        <a href="/signup" style={{ textDecoration: "underline" }}>
-          Tilmeld dig her
-        </a>
-      </p>
+        <p className="tilmeld-tekst">
+          Har du ikke en konto?{" "}
+          <a href="/signup">
+            Tilmeld dig her
+          </a>
+        </p>
+      </div>
+     
     </div>
   )
 }
