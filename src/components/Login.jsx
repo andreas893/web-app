@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, FacebookAuthProvider, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
@@ -39,9 +39,52 @@ export default function Login() {
     }
   };
 
+
+  const handleGoogleLogin = async () =>{
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider)
+      console.log("logget ind med google");
+      navigate("/");      
+    } catch (error) {
+      console.error("facebook-login fejl", error.message);
+      setError("Noget gik galt med Facebook-login.");
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    const provider = new FacebookAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      console.log("✅ Logget ind med Facebook");
+      navigate("/");
+    } catch (error) {
+      console.error("Facebook-login fejl:", error.message);
+      setError("Noget gik galt med Facebook-login.");
+    }
+  };
+
+  const handleSpotifyLogin = () =>{
+    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+    const redirectUri = window.location.origin + "/";
+    const scopes = "user-read-email user-read-private";
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${redirectUri}&scope=${scopes}`;
+    window.location.href = authUrl;
+  }
+
   return (
      <div className="login-page">
+      
       <h2>Log på “app-navn”</h2>
+      
+      {/* socials login */}
+
+      <button onClick={handleSpotifyLogin} className="social-btn spotify"><img src="../assets/images/spotify.png" alt="" />Fortsæt med Spotify</button>
+      <button onClick={handleGoogleLogin} className="social-btn google"><img src="../assets/images/google.png" alt="" />Fortsæt med Google</button>
+      <button onClick={handleFacebookLogin} className="social-btn facebook"><img src="../assets/images/facebook-01.png" alt="" />Fortsæt med Facebook</button>
+
+      <span className="line"></span>
+
       <form onSubmit={handleLogin}>
         <input
           type="text"
