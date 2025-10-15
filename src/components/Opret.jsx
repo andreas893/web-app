@@ -3,6 +3,7 @@ import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import "../login.css";
 
 const Opret = () => {
     const [email, setEmail] = useState("");
@@ -29,7 +30,7 @@ const Opret = () => {
             });
         
          console.log("Bruger oprettet ✅"); 
-         navigate("/", { replace: true });
+         navigate("/onboarding", { replace: true });
         } catch (err) {
                 setError(err.message);
                 }
@@ -40,7 +41,7 @@ const Opret = () => {
 
 
   return (
-     <div className="login-page">
+     <div className="opret-page">
       <h2>Opret konto</h2>
       <form onSubmit={handleSignup}>
          <input
