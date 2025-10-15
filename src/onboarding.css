@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #121212;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* Skjul horizontale scrollbars på iOS/Chrome */
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Styling af progressbar */
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.dot.active {
+  background: linear-gradient(90deg, #8a2eff, #3b82f6);
+  box-shadow: 0 0 8px rgba(138, 46, 255, 0.6);
+}
+
+
+/* Genre filtrering styling */
+.step-genre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.multi-select {
+  position: relative;
+  width: 90%;
+  margin: 1rem 0;
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.chip button {
+  background: none;
+  border: none;
+  color: white;
+  margin-left: 0.3rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.chips-container input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  min-width: 80px;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: rgba(25, 25, 25, 0.9);
+  border-radius: 12px;
+  margin-top: 0.3rem;
+  max-height: 180px;
+  overflow-y: auto;
+  backdrop-filter: blur(6px);
+}
+
+.dropdown-item {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(138, 46, 255, 0.3);
+}
+
+.next-btn {
+  margin-top: 2rem;
+  background: linear-gradient(90deg, #8a2eff, #3b82f6);
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 1.5rem;
+  border: none;
+  cursor: pointer;
+}

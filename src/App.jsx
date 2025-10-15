@@ -5,6 +5,7 @@ import LandingPage from "./pages/landingPage";
 import Login from "./components/Login";
 import Opret from "./components/Opret";
 import ProtectedRoute from "./components/ProtectedRoute";
+import OnboardingPage from "./pages/OnboardingPage"
 
 
 
@@ -16,6 +17,11 @@ export default function App() {
         {/* Login & Signup */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Opret />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/signup" element={<Opret />} />
+        
+
+
 
         {/* Landingpage (kun én route!) */}
         <Route
@@ -26,6 +32,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
+        
 
         {/* Redirect ukendte sider */}
         <Route path="*" element={<Navigate to="/" replace />} />
