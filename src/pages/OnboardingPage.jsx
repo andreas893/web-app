@@ -5,6 +5,7 @@ import StepDiscover from "../components/StepDiscover";
 import StepSummary from "../components/StepSummary";
 import StepAge from "../components/StepAge";
 import StepIntro from "../components/StepIntro";
+import "../onboarding.css";
 
 export default function OnboardingPage() {
  const [step, setStep] = useState(1);

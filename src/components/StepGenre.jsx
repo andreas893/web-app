@@ -30,7 +30,7 @@ export default function StepGenre({ onNext }) {
 
   return (
     <div className="step step-genre">
-      <h2>Hvilke genrer lytter du mest til?</h2>
+      <h1>Hvilke genrer lytter du mest til?</h1>
       <p>Vælg de 5 genrer du aldrig bliver træt af</p>
 
       {/* Søgefelt med chips */}

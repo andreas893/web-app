@@ -2,6 +2,13 @@
 
 :root {
   --bg: #121212;
+  --text-color: #E0E0E0;
+  --primary-color: #4D00FF;
+  --tetriary-color:#23262C;
+  --font-size-p:1.2rem;
+  --font-size-med:1.4rem;
+  --font-size-h2:1.6rem;
+  --font-size-h1:2.2rem;
 }
 
 html, body, #root {
@@ -9,13 +16,63 @@ html, body, #root {
 }
 
 body {
-  background: var(--bg);
   font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 /* Skjul horizontale scrollbars på iOS/Chrome */
 .hide-scroll::-webkit-scrollbar { display: none; }
 .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+.onboarding{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-image: url(/images/login-bg.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    padding: 1rem;
+}
+
+
+/* styling af intro siden */
+.intro-container{
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.heading-intro{
+    margin-top: 2rem;
+}
+
+.heading-intro h1{
+    font-size: var(--font-size-h1);
+}
+
+.content-intro{
+    margin-top: 50%;
+    margin-bottom: auto;
+}
+
+.content-intro p{
+    font-size: var(--font-size-med);
+}
+
+
+.content-intro button{
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-size: var(--font-size-p);
+    border-radius: 18px;
+    width: 100%;
+    padding: 0.5rem 0;
+    margin-top: 1.4rem;
+}
+
+
+
+
 
 /* Styling af progressbar */
 .progress-dots {
@@ -39,18 +96,35 @@ body {
 }
 
 
-/* Genre filtrering styling */
-.step-genre {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: white;
+
+/* Styling af genrestep */
+.step-genre h1{
+    font-size: var(--font-size-h1);
 }
+
+.step-genre p{
+    font-size: var(--font-size-med);
+    margin-top: 40%;
+    margin-bottom: auto;
+}
+
+.step-genre{
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+
+
+/* Genre filtrering styling */
 
 .multi-select {
   position: relative;
-  width: 90%;
-  margin: 1rem 0;
+  width: 100%;
+  margin: 2rem 0;
 }
 
 .chips-container {
@@ -58,18 +132,19 @@ body {
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  padding: 0.6rem 0.8rem;
+    background: var(--text-color);
+  border-radius: 18px;
+  width: 100%;
+  padding: 0.5rem 1rem;
 }
 
 .chip {
   display: flex;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.9rem;
+  background-color: var(--tetriary-color);
+  border-radius: 10px;
+  padding: 0.4rem 0.5rem;
+  font-size: 1rem;
 }
 
 .chip button {
@@ -85,7 +160,7 @@ body {
   flex: 1;
   background: transparent;
   border: none;
-  color: white;
+  color:var(--tetriary-color);
   font-size: 1rem;
   outline: none;
   min-width: 80px;
@@ -96,7 +171,8 @@ body {
   top: 100%;
   left: 0;
   width: 100%;
-  background-color: rgba(25, 25, 25, 0.9);
+    background-color: var(--tetriary-color);
+    color: var(--text-color);
   border-radius: 12px;
   margin-top: 0.3rem;
   max-height: 180px;
@@ -116,10 +192,14 @@ body {
 
 .next-btn {
   margin-top: 2rem;
-  background: linear-gradient(90deg, #8a2eff, #3b82f6);
+  background-color: var(--primary-color);
   color: white;
   padding: 0.8rem 2rem;
-  border-radius: 1.5rem;
+  width: 100%;
+  border-radius: 18px;
   border: none;
   cursor: pointer;
 }
+
+/* styling af mood step */
+
