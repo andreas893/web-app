@@ -2,6 +2,13 @@
 
 :root {
   --bg: #121212;
+  --text-color: #E0E0E0;
+  --primary-color: #4D00FF;
+  --tetriary-color:#23262C;
+  --font-size-p:1.2rem;
+  --font-size-med:1.4rem;
+  --font-size-h2:1.6rem;
+  --font-size-h1:2.2rem;
 }
 
 html, body, #root {
@@ -9,13 +16,74 @@ html, body, #root {
 }
 
 body {
-  background: var(--bg);
   font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 /* Skjul horizontale scrollbars på iOS/Chrome */
 .hide-scroll::-webkit-scrollbar { display: none; }
 .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+.onboarding{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    max-height: 100vh;
+    background-image: url(/images/login-bg.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    padding: 1rem;
+    overflow: hidden;
+    color: var(--text-color);
+}
+
+
+/* styling af intro siden */
+.intro-container{
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.heading-intro{
+    margin-top: 2rem;
+}
+
+.heading-intro h1{
+    font-size: var(--font-size-h1);
+}
+
+.content-intro{
+    margin-top: 50%;
+    margin-bottom: auto;
+}
+
+.content-intro p{
+    font-size: var(--font-size-med);
+}
+
+
+.content-intro button{
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-size: var(--font-size-p);
+    border-radius: 18px;
+    width: 100%;
+    padding: 0.5rem 0;
+    margin-top: 1.4rem;
+}
+
+
+/* Styling af back button */
+.back-btn {
+  background: var(--text-color);
+  border: 2px solid var(--text-color);
+  border-radius: 1.5rem;
+  width: 100%;
+  padding: 0.5rem 1.2rem;
+  margin-top: 1rem;
+  color: var(--tetriary-color);
+}
 
 /* Styling af progressbar */
 .progress-dots {
@@ -39,18 +107,36 @@ body {
 }
 
 
-/* Genre filtrering styling */
-.step-genre {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: white;
+
+/* Styling af genrestep */
+.step-genre h1{
+    font-size: var(--font-size-h1);
 }
+
+.step-genre p{
+    font-size: var(--font-size-med);
+    margin-top: 40%;
+    margin-bottom: auto;
+}
+
+.step-genre{
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+
+
+/* Genre filtrering styling */
 
 .multi-select {
   position: relative;
-  width: 90%;
-  margin: 1rem 0;
+  width: 100%;
+  margin: 2rem 0;
+  z-index: 10;
 }
 
 .chips-container {
@@ -58,18 +144,19 @@ body {
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  padding: 0.6rem 0.8rem;
+    background: var(--text-color);
+  border-radius: 18px;
+  width: 100%;
+  padding: 0.5rem 1rem;
 }
 
 .chip {
   display: flex;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.9rem;
+  background-color: var(--tetriary-color);
+  border-radius: 10px;
+  padding: 0.4rem 0.5rem;
+  font-size: 1rem;
 }
 
 .chip button {
@@ -85,7 +172,7 @@ body {
   flex: 1;
   background: transparent;
   border: none;
-  color: white;
+  color:var(--tetriary-color);
   font-size: 1rem;
   outline: none;
   min-width: 80px;
@@ -96,12 +183,12 @@ body {
   top: 100%;
   left: 0;
   width: 100%;
-  background-color: rgba(25, 25, 25, 0.9);
+    background-color: var(--tetriary-color);
+    color: var(--text-color);
   border-radius: 12px;
   margin-top: 0.3rem;
   max-height: 180px;
   overflow-y: auto;
-  backdrop-filter: blur(6px);
 }
 
 .dropdown-item {
@@ -116,10 +203,252 @@ body {
 
 .next-btn {
   margin-top: 2rem;
-  background: linear-gradient(90deg, #8a2eff, #3b82f6);
-  color: white;
+  background-color: var(--primary-color);
   padding: 0.8rem 2rem;
-  border-radius: 1.5rem;
+  width: 100%;
+  border-radius: 18px;
   border: none;
   cursor: pointer;
+}
+
+/* styling af mood step */
+.mood-container h1{
+    font-size: var(--font-size-h1);
+}
+
+.mood-container p{
+    font-size: var(--font-size-med);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+/* Styling af mood cirkler */
+.mood-container {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-color);
+  min-height: 100%;
+  margin-top: 2rem;
+}
+
+.gooey-container {
+  filter: url(#goo);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  color: #E0E0E0;
+  gap: 0.3rem;
+}
+
+.blob {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  background-size: cover;
+  transition: filter 0.3s ease, box-shadow 0.3s ease;
+  opacity: 1;
+   animation: pulseFluid 3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  transform-origin: center;
+}
+
+.blob.selected {
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+
+}
+
+@keyframes pulseFluid {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+  
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.blob:nth-child(2n) {
+  animation-delay: 0.6s;
+}
+.blob:nth-child(3n) {
+  animation-delay: 1.2s;
+}
+
+/* styling af nyt eller nostalgisk musik step */
+.step-era {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-color);
+}
+
+.step-era h1{
+    font-size: var(--font-size-h1);
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+    color: var(--text-color);
+}
+
+.step-era p{
+    font-size: var(--font-size-med);
+}
+
+.choice-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem 0;
+}
+
+.step-era .p-small{
+    font-size: 1rem;
+    margin-top: 1rem;
+}
+
+.choice-container p{
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.choice {
+  width: 100%;
+  padding: 1.2rem;
+  border-radius: 1rem;
+  background:var(--tetriary-color);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  text-align: left;
+  cursor: pointer;
+}
+
+.choice.active {
+  border-color: #9b5cff;
+  background: linear-gradient(145deg, #231942,#4D00FF);
+  transform: scale(1.02);
+}
+
+.choice h3 {
+  margin: 0 0 0.2rem 0;
+}
+
+.next-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Styling af discover step */
+.discover-page{
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+      overflow: hidden;
+}
+
+.discover-page h1{
+    font-size: var(--font-size-h1);
+    margin-top: 2rem;
+}
+
+.choice-container-discover{
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.choice-container-discover button{
+   width: 160px;
+   height: 160px;
+   display: flex;
+   justify-content: end;
+    border-radius: 1rem;
+  border: 2px solid transparent;
+   padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.choice-container-discover button.active{
+      background-color: transparent;       /* påvirker ikke billedet */
+  border-color: #9b5cff;
+  box-shadow: 0 0 25px rgba(155, 92, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.choice-1{
+    background-image: url(/images/discover.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.choice-2{
+    background-image: url(/images/favorites.png);
+     background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+/* summary stlying */
+.summary-page {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+
+}
+
+.summary-text-1 {
+  max-width: 100%;
+  height: 100%;
+}
+
+.summary-text-2{
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+    height: 100%;
+}
+
+.summary-text-1 h1, .summary-text-2 h1 {
+  font-size: var(--font-size-h1);
+  padding-bottom: 1rem;
+}
+
+.summary-text-1 p, .summary-text-2 p {
+font-size: var(--font-size-med);
+}
+
+.summary-text-1 h1{
+    margin-bottom: 2rem;
+}
+
+.summary-text-1 .p-first{
+    margin-bottom: 2rem;
+}
+
+.arrow-down {
+  margin-top: 1.2rem;
+  font-size: 1.8rem;
+  animation: bounce 1.8s infinite ease-in-out;
+}
+
+/* lille “hop” animation */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
 }

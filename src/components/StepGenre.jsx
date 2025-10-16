@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore"; 
+import { auth, db } from "../firebase";
+import BackButton from "./BackButton";
 
-export default function StepGenre({ onNext }) {
+export default function StepGenre({ onNext, onPrev }) {
   const allGenres = [
     "Pop", "Hip Hop", "Rap", "Rock", "Indie", "R&B", "Jazz", "Classical",
     "Electronic", "Metal", "Country", "Funk", "Soul", "House", "Techno",
@@ -9,6 +12,7 @@ export default function StepGenre({ onNext }) {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selected, setSelected] = useState([]);
+    const [status, setStatus] = useState("");
 
   const filteredGenres = allGenres.filter(
     g => g.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -28,9 +32,26 @@ export default function StepGenre({ onNext }) {
     setSelected(selected.filter(g => g !== genre));
   };
 
+   async function handleContinue() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const userDoc = doc(db, "users", user.uid);
+      await updateDoc(userDoc, {genres: selected });
+      setStatus("Dine genrer er gemt 🎶");
+    } catch (error) {
+      console.error("Fejl ved gemning af genrer:", error);
+      setStatus("Der opstod en fejl. Prøv igen.");
+    }
+
+    // Gå videre til næste step
+    if (onNext) onNext(selected);
+  }
+
   return (
     <div className="step step-genre">
-      <h2>Hvilke genrer lytter du mest til?</h2>
+      <h1>Hvilke genrer lytter du mest til?</h1>
       <p>Vælg de 5 genrer du aldrig bliver træt af</p>
 
       {/* Søgefelt med chips */}
@@ -69,11 +90,15 @@ export default function StepGenre({ onNext }) {
 
       <button
         className="next-btn"
-        onClick={() => onNext(selected)}
+        onClick={handleContinue}
         disabled={selected.length === 0}
       >
         Fortsæt
       </button>
+
+        <BackButton onPrev={onPrev} /> 
+
+        {status && <p className="status-text">{status}</p>}
     </div>
   );
 }

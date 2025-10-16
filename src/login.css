@@ -2,6 +2,13 @@
 
 :root {
   --bg: #121212;
+  --text-color: #E0E0E0;
+  --primary-color: #4D00FF;
+  --tetriary-color:#23262C;
+  --font-size-p:1.2rem;
+  --font-size-med:1.4rem;
+  --font-size-h2:1.6rem;
+  --font-size-h1:2.2rem;
 }
 
 html, body, #root {
