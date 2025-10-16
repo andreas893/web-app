@@ -7,6 +7,8 @@ import StepAge from "../components/StepAge";
 import StepIntro from "../components/StepIntro";
 import "../onboarding.css";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
+import { useEffect } from "react";
 
 export default function OnboardingPage() {
  const [step, setStep] = useState(1);
@@ -15,6 +17,11 @@ export default function OnboardingPage() {
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
+  useEffect(() => {
+  if (!auth.currentUser) {
+    navigate("/login");
+  }
+}, []);
   return (
     <div className="onboarding">
       {step === 1 && <StepIntro onNext={nextStep} />}
