@@ -7,6 +7,7 @@ import Opret from "./components/Opret";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OnboardingPage from "./pages/OnboardingPage"
 import MoodSelectPage from "./pages/MoodSelectPage";
+import LibraryPage from "./pages/LibraryPage";
 
 
 
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path="/signup" element={<Opret />} />
         <Route path="/mood-select" element={<MoodSelectPage />} />
+        <Route path="/library" element={<LibraryPage />} />
 
 
 
