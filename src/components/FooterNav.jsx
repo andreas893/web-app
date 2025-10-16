@@ -1,4 +1,4 @@
-import { Home, Library, Plus, MessageCircle, User } from "lucide-react";
+import { Home, Library, Plus, MessageCircle, User, } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 export default function FooterNav() {
