@@ -201,7 +201,41 @@ body {
 }
 
 
+.popup-icon {
+  background-color:var(--text-color);
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tetriary-color);
+}
 
+.popup-text h3 {
+  font-size: var(--font-size-med);
+  font-weight: 700;
+  margin: 0;
+}
+
+.popup-text p {
+  font-size: 0.9rem;
+  color: #a0a0a0;
+  margin: 0.2rem 0 0;
+}
+
+.popup-cancel {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: #e0e0e0;
+  font-weight: 500;
+  cursor: pointer;
+  padding-top: 0.5rem;
+}
 
 
 
