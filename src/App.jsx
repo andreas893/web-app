@@ -1,45 +1,34 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-
-
-import LandingPage from "./pages/landingPage";
+import { Routes, Route } from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
+import ShareSong from "./components/ShareSong";
 import Login from "./components/Login";
-import Opret from "./components/Opret";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OnboardingPage from "./pages/OnboardingPage"
 import MoodSelectPage from "./pages/MoodSelectPage";
 import LibraryPage from "./pages/LibraryPage";
 
-
-
-
 export default function App() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-black text-white">
       <Routes>
-        {/* Login & Signup */}
+        {/* Startside */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Dele en sang */}
+        <Route path="/share" element={<ShareSong />} />
+
+        {/* Login (til senere) */}
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Opret />} />
-        <Route path="/onboarding" element={<OnboardingPage />} />
-        <Route path="/signup" element={<Opret />} />
-        <Route path="/mood-select" element={<MoodSelectPage />} />
-        <Route path="/library" element={<LibraryPage />} />
 
-
-
-        {/* Landingpage (kun én route!) */}
+        {/* Beskyttet side */}
         <Route
-          path="/"
+          path="/protected"
           element={
             <ProtectedRoute>
-              <LandingPage />
+              <h1>Kun for loggede brugere</h1>
             </ProtectedRoute>
           }
         />
-
-        
-
-        {/* Redirect ukendte sider */}
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </main>
   );
