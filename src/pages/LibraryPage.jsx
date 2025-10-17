@@ -1,5 +1,7 @@
 import FooterNav from "../components/FooterNav"
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { auth, db } from "../firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
 import { LayoutGrid, List } from "lucide-react"
@@ -9,8 +11,27 @@ export default function LibraryPage() {
      const [activeTab, setActiveTab] = useState(null);
      const [viewMode, setViewMode] = useState("list");
      const [showPopup, setShowPopup] = useState(false);
+     const [savedPlaylists, setSavedPlaylists] = useState([]);
     const navigate = useNavigate();
     
+
+    useEffect(() => {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const userRef = doc(db, "users", user.uid);
+
+  // Realtime listener så library opdateres straks når der gemmes/fjernes
+  const unsub = onSnapshot(userRef, (snap) => {
+    if (snap.exists()) {
+      setSavedPlaylists(snap.data().playlists || []);
+    }
+  });
+
+  return () => unsub();
+}, []);
+
+
     const playlists = [
     {
       id: "temp1",
@@ -51,12 +72,21 @@ export default function LibraryPage() {
     setActiveTab((prev) => (prev === tabName ? null : tabName));
   };
 
-  const filteredPlaylists =
+    const combinedData = [...playlists, ...savedPlaylists.map((s) => ({
+    id: s.id,
+    name: s.song || s.name || "Ukendt titel",
+    createdBy: s.user || "Ukendt bruger",
+    isMine: false,
+    coverUrl: s.imgUrl || s.coverUrl || "https://via.placeholder.com/150",
+  }))];
+
+
+ const filteredPlaylists =
     activeTab === "mine"
-      ? playlists.filter((p) => p.isMine)
+      ? combinedData.filter((p) => p.isMine)
       : activeTab === "saved"
-      ? playlists.filter((p) => !p.isMine)
-      : playlists; // default vis alle
+      ? combinedData.filter((p) => !p.isMine)
+      : combinedData;
   
     return (
     <div className={`library-page ${viewMode}-view`}>
