@@ -3,6 +3,9 @@ import LandingPage from "./pages/LandingPage";
 import ShareSong from "./components/ShareSong";
 import Login from "./components/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
+import OnboardingPage from "./pages/OnboardingPage"
+import MoodSelectPage from "./pages/MoodSelectPage";
+import LibraryPage from "./pages/LibraryPage";
 
 export default function App() {
   return (

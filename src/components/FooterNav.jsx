@@ -14,7 +14,7 @@ export default function FooterNav() {
   ];
 
   return (
-    <footer className="fixed bottom-0 left-0 w-full bg-[#121212] border-t border-gray-800 py-3">
+    <footer className="sticky bottom-0 left-0 w-full bg-[#121212] border-t border-gray-800 py-3">
       <div className="flex justify-around items-center">
         {icons.map(({ icon: Icon, path }) => (
           <Icon
