@@ -10,11 +10,12 @@ import "../library.css";
 export default function LibraryPage() {
      const [activeTab, setActiveTab] = useState(null);
      const [viewMode, setViewMode] = useState("list");
-     const [showPopup, setShowPopup] = useState(false);
      const [savedPlaylists, setSavedPlaylists] = useState([]);
+     const [activePlaylist, setActivePlaylist] = useState(null);
+     const [popupType, setPopupType] = useState(null);
     const navigate = useNavigate();
     
-
+    // Luk når man klikker uden for popup create
     useEffect(() => {
   const user = auth.currentUser;
   if (!user) return;
@@ -36,7 +37,7 @@ export default function LibraryPage() {
     {
       id: "temp1",
       name: "Morning Vibes",
-      createdBy: "andreas",
+      createdBy: "test5",
       isMine: true,
       coverUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4",
     },
@@ -109,7 +110,7 @@ export default function LibraryPage() {
         
         
         <div className="view-options">
-             <button onClick={() => setShowPopup(true)} className="create-playlist-btn">
+             <button onClick={() => setPopupType("create")} className="create-playlist-btn">
            <span>＋</span> Opret Playlist
              </button>
 
@@ -132,23 +133,55 @@ export default function LibraryPage() {
         {filteredPlaylists.map((playlist) => (
           <div key={playlist.id} className="library-playlist-card">
             <img src={playlist.coverUrl} alt={playlist.name} className="cover" />
+            
             <div className="info">
               <h3>{playlist.name}</h3>
               <p>Af {playlist.createdBy}</p>
             </div>
+
+            <button
+                className="playlist-options-btn"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setActivePlaylist(playlist);
+                    setPopupType("options");
+                }}
+                >
+                ⋯
+            </button>
+            
           </div>
         ))}
       </div>
           
-           {showPopup && (
+         {popupType === "create" && (
         <CreatePlaylistPopup
-          onClose={() => setShowPopup(false)}
-          onNavigate={(path) => {
-            setShowPopup(false);
+            type="create"
+            onClose={() => setPopupType(null)}
+            onNavigate={(path) => {
+            setPopupType(null);
             navigate(path);
-          }}
+            }}
         />
-      )}
+        )}
+
+        {popupType === "options" && (
+        <CreatePlaylistPopup
+            type="options"
+            playlist={activePlaylist}
+            onClose={() => setPopupType(null)}
+            onShare={() => { setPopupType(null); setTimeout(() => setPopupType("share"), 200);
+        }}
+        />
+        )}
+
+        {popupType === "share" && (
+        <CreatePlaylistPopup
+            type="share"
+            playlist={activePlaylist}
+            onClose={() => setPopupType(null)}
+        />
+        )}
 
         <FooterNav />
     </div>
