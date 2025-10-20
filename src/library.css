@@ -12,12 +12,13 @@
 }
 
 html, body, #root {
-  min-height: 100%;
-  height: auto;
+  height: 100%;
 }
 
 body {
   background: var(--bg);
+  min-height: 100vh;
+  overflow-y: auto;
   color: var(--text-color);
   font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
@@ -27,12 +28,14 @@ body {
 .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
 .library-page-container{
-    height: 100%;
+    min-height: 100%;
 }
 
 .library-page{
     padding: 1rem;
     min-height: 100vh;
+    height: auto;
+    padding-bottom: 80px;
 }
 
 /* Styling af heading */
@@ -92,6 +95,7 @@ body {
   border-radius: 18px;
   padding: 0.6rem;
   gap: 1rem;
+  position: relative;
 }
 
 .library-playlist-card img.cover {
@@ -160,7 +164,7 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(1px);
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -237,8 +241,209 @@ body {
   padding-top: 0.5rem;
 }
 
+/* Styling af options knap */
+.playlist-options-btn {
+  background: none;
+  border: none;
+  color: #e0e0e0;
+  font-size: 1.8rem;
+  margin-left: auto;
+  cursor: pointer;
+  padding: 0 0.3rem;
+  transition: color 0.2s;
+}
+
+.playlist-options-menu {
+  position: absolute;
+  right: 1rem;
+  top: 3rem;
+  background-color: var(--tetriary-color);
+  border-radius: 10px;
+  padding: 0.6rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  z-index: 50;
+}
+
+.playlist-options-menu button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  text-align: left;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.playlist-options-menu .cancel {
+  color: #aaa;
+  font-weight: 500;
+}
 
 
+/* delete confirm styling */
+
+.confirm-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(1px);
+  z-index: 200;
+}
+
+.confirm-popup {
+  background-color: var(--tetriary-color);
+  border-radius: 18px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  max-width: 340px;
+  width: 90%;
+  animation: fadeIn 0.25s ease;
+}
+
+.confirm-popup h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.confirm-popup p {
+  color: #aaa;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.confirm-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.confirm-buttons .cancel,
+.confirm-buttons .delete {
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.confirm-buttons .cancel {
+  background-color: transparent;
+  color: #ccc;
+  border: 1px solid #555;
+}
+
+.confirm-buttons .cancel:hover {
+  background-color: #2a2a2a;
+}
+
+.confirm-buttons .delete {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.confirm-buttons .delete:hover {
+  background-color: #e03e3e;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Rød delete-knap i options-menu */
+.delete-icon {
+  background-color: #ff4d4d !important;
+  color: white !important;
+}
+
+/* === Share Playlist Popup styling === */
+
+.share-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+.friends-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--tetriary-color);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.friend-item:hover {
+  background-color: #2a2a2a;
+}
+
+.friend-item.selected {
+  background-color: #3a3a3a;
+}
+
+.friend-item .avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1rem;
+}
+
+.friend-item span {
+  flex: 1;
+  font-size: 1rem;
+}
+
+.share-btn {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 12px;
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.share-btn.active {
+  background-color: #7b47ff;
+}
+
+.share-send {
+  width: 100%;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 12px;
+  padding: 0.8rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.share-send:disabled {
+  background-color: #3a3a3a;
+  color: #777;
+  cursor: not-allowed;
+}
 
 
 
