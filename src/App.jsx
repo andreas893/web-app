@@ -3,17 +3,21 @@ import LandingPage from "./pages/LandingPage";
 import ShareSong from "./components/ShareSong";
 import Login from "./components/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import OnboardingPage from "./pages/OnboardingPage"
+import OnboardingPage from "./pages/OnboardingPage";
 import LibraryPage from "./pages/LibraryPage";
 import Opret from "./components/Opret";
-import PlaylistView from "./pages/PlaylistView";
+
+// 🔥 Wrapped sider
+import WrappedWeek from "./pages/WrappedWeek";
+import WrappedMonth from "./pages/WrappedMonth";
+
 export default function App() {
   return (
     <main className="min-h-screen bg-black text-white">
       <Routes>
-         <Route path="/onboarding" element={<OnboardingPage />} />
-          <Route path="/signup" element={<Opret />} />
-
+        {/* Onboarding og Signup */}
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/signup" element={<Opret />} />
 
         {/* Startside */}
         <Route path="/" element={<LandingPage />} />
@@ -23,14 +27,15 @@ export default function App() {
 
         {/* Login (til senere) */}
         <Route path="/login" element={<Login />} />
-        
+
         {/* Library side */}
         <Route path="/library" element={<LibraryPage />} />
 
-        <Route path="/playlist/:id" element={<PlaylistView />} />
-        <Route path="feed/playlist/:id" element={<PlaylistView />} />
+        {/* Wrapped sider */}
+        <Route path="/wrapped-week" element={<WrappedWeek />} />
+        <Route path="/wrapped-month" element={<WrappedMonth />} />
 
-        {/* Beskyttet side */}
+        {/* Beskyttet testside */}
         <Route
           path="/protected"
           element={
