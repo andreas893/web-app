@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router";
 import { User, Heart, MessageSquare, Bookmark, X, Trash2 } from "lucide-react";
-import { db, auth } from "../firebase";
+import { db, auth} from "../firebase";
 import {
   collection,
   addDoc,
@@ -12,6 +13,9 @@ import {
   doc,
   setDoc,
   getDocs,
+  arrayUnion, 
+  arrayRemove,
+  updateDoc
 } from "firebase/firestore";
 
 export default function Feed() {
@@ -23,6 +27,7 @@ export default function Feed() {
   const [newComment, setNewComment] = useState("");
   const [deleting, setDeleting] = useState(null);
   const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
 
   const holdTimer = useRef(null);
   const progressTimer = useRef(null);
@@ -152,17 +157,40 @@ export default function Feed() {
     if (!user) return alert("Log ind for at gemme!");
     const postId = post.id.toString();
     const docRef = doc(db, "saves", `${user.uid}_${postId}`);
-    if (saved[postId]) {
-      await deleteDoc(docRef);
-    } else {
-      await setDoc(docRef, {
-        postId,
-        userId: user.uid,
-        timestamp: serverTimestamp(),
-      });
-    }
-    setSaved((prev) => ({ ...prev, [postId]: !prev[postId] }));
-  };
+    const userRef = doc(db, "users", user.uid);
+    
+   
+  if (saved[postId]) {
+    // ❌ Fjern fra saves og fra brugerens playlists
+    await deleteDoc(docRef);
+    await updateDoc(userRef, {
+      playlists: arrayRemove({
+        id: post.id,
+        song: post.song,
+        user: post.user,
+        imgUrl: post.imgUrl,
+      }),
+    });
+  } else {
+    // ✅ Gem i saves + tilføj til brugerens playlists
+    await setDoc(docRef, {
+      postId,
+      userId: user.uid,
+      timestamp: serverTimestamp(),
+    });
+
+    await updateDoc(userRef, {
+      playlists: arrayUnion({
+        id: post.id,
+        song: post.song,
+        user: post.user,
+        imgUrl: post.imgUrl,
+      }),
+    });
+  }
+
+  setSaved((prev) => ({ ...prev, [postId]: !prev[postId] }));
+};
 
   // 🗑️ Hold for delete
   const startHold = (postId) => {
@@ -213,7 +241,7 @@ export default function Feed() {
             <div
               key={post.id}
               className="flex-shrink-0 w-[220px] bg-[#1E1E1E] rounded-[18px] overflow-hidden cursor-pointer relative"
-              onClick={() => setActivePost({ ...postRaw, ...post })}
+              onClick={() => navigate(`/feed/playlist/${postRaw.id}`)}
             >
               <div className="relative">
                 {post.imgUrl ? (
@@ -250,10 +278,10 @@ export default function Feed() {
                   />
                   <MessageSquare
                     className="w-7 h-7 text-white cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActivePost({ ...postRaw, ...post });
-                    }}
+                      onClick={(e) => {
+                        e.stopPropagation(); // forhindrer at kortets onClick trigges
+                        setActivePost({ ...postRaw, ...post }); // åbner popup med kommentarer
+                      }}
                   />
                   <Bookmark
                     fill={saved[post.id] ? "gold" : "none"}
