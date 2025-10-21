@@ -4,7 +4,7 @@ import { auth, db } from "../firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
-import { LayoutGrid, List } from "lucide-react"
+import { LayoutGrid, List, EllipsisVertical } from "lucide-react"
 import "../library.css";
 
 export default function LibraryPage() {
@@ -131,7 +131,7 @@ export default function LibraryPage() {
 
          <div className={`playlist-list ${viewMode}`}>
         {filteredPlaylists.map((playlist) => (
-          <div key={playlist.id} className="library-playlist-card">
+          <div key={playlist.id} className="library-playlist-card" onClick={() => navigate(`/playlist/${playlist.id}`)}>
             <img src={playlist.coverUrl} alt={playlist.name} className="cover" />
             
             <div className="info">
@@ -147,7 +147,7 @@ export default function LibraryPage() {
                     setPopupType("options");
                 }}
                 >
-                ⋯
+                    <EllipsisVertical />
             </button>
             
           </div>
