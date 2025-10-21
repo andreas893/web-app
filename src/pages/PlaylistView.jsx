@@ -7,6 +7,7 @@ import { db, auth } from "../firebase";
 import { ArrowLeft, User, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp } from "lucide-react";
 import "../playlistView.css";
 import FooterNav from "../components/FooterNav";
+import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
 
 
 export default function PlaylistView() {
@@ -23,6 +24,9 @@ export default function PlaylistView() {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [isSaved, setIsSaved] = useState(false);
+    const [popupType, setPopupType] = useState(null);
+    const [popupContext, setPopupContext] = useState(null);
+    const [selectedSong, setSelectedSong] = useState(null);
 
     // fetch playliste fra firebase
     useEffect(() => {
@@ -259,7 +263,12 @@ export default function PlaylistView() {
                                 <p className="song-artist">{song.artist}</p>
                             </div>
                             </div>
-                            <EllipsisVertical className="options" />
+                            <EllipsisVertical className="options" onClick={(e) => {
+                                e.stopPropagation();
+                                setPopupType("options")
+                                setPopupContext("song")
+                                setSelectedSong(song);
+                            }}/>
                         </div>
                     ))}
 
@@ -348,6 +357,30 @@ export default function PlaylistView() {
                     </div>
                 </div>
             )}
+
+            {popupType === "options" && (
+                <CreatePlaylistPopup
+                    type="options"
+                    playlist={playlist}
+                    context={popupContext}
+                    song={selectedSong} 
+                    onClose={() => setPopupType(null)}
+                    onShare={() => {
+                    setPopupType(null);
+                    setTimeout(() => setPopupType("share"), 200);
+                    }}
+                />
+                )}
+
+            {popupType === "share" && (
+                <CreatePlaylistPopup
+                    type="share"
+                    context={popupContext}  
+                    song={selectedSong}
+                    playlist={playlist}
+                    onClose={() => setPopupType(null)}
+                />
+                )}
             <FooterNav />
         </div>
     );
