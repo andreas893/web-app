@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Music, Sparkles, Users, Pin, Share2, Trash2, PinOff, AlertTriangle } from "lucide-react";
+import { Music, Sparkles, Users, Pin, Share2, Trash2, PinOff, AlertTriangle, Plus } from "lucide-react";
 import { updateDoc, doc, arrayUnion, arrayRemove, getDoc, deleteDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 
-export default function CreatePlaylistPopup({ type = "create", onClose, onNavigate, playlist, onShare }) {
+export default function CreatePlaylistPopup({ type = "create", onClose, onNavigate, playlist, onShare, context="playlist", song }) {
   const popupRef = useRef(null);
   const [isPinned, setIsPinned] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -107,6 +107,37 @@ const handleDelete = async () => {
   );
 };
 
+const handleShare = async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Du skal være logget ind for at dele!");
+    return;
+  }
+
+  if (selectedFriends.length === 0) {
+    alert("Vælg mindst én ven at dele med.");
+    return;
+  }
+
+  try {
+    for (const friendId of selectedFriends) {
+      await updateDoc(doc(db, "users", friendId), {
+        sharedWithMe: arrayUnion({
+          from: user.uid,
+          fromName: user.displayName || user.email.split("@")[0],
+          context,
+          item: context === "song" ? song : playlist,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    }
+    console.log("✅ Delt med:", selectedFriends);
+    onClose();
+  } catch (err) {
+    console.error("Fejl ved deling:", err);
+  }
+};
+
 
   return (
     <div className="popup-overlay">
@@ -142,37 +173,77 @@ const handleDelete = async () => {
 
 {type === "options" && (
   <>
-    {/* OPTIONS MENU */}
-    <button className="popup-item" onClick={togglePin}>
-      <div className="popup-icon">{isPinned ? <PinOff size={25} /> : <Pin size={25} />}</div>
-      <div className="popup-text">
-        <h3>{isPinned ? "Fjern pin" : "Pin playliste"}</h3>
-        <p>{isPinned ? "Fjern playlisten fra dine pinned" : "Fastgør denne playliste øverst"}</p>
-      </div>
-    </button>
+    {context === "playlist" && (
+      <>
+        <button className="popup-item" onClick={togglePin}>
+          <div className="popup-icon">
+            {isPinned ? <PinOff size={25} /> : <Pin size={25} />}
+          </div>
+          <div className="popup-text">
+            <h3>{isPinned ? "Fjern pin" : "Pin playliste"}</h3>
+            <p>{isPinned ? "Fjern playlisten fra dine pinned" : "Fastgør denne playliste øverst"}</p>
+          </div>
+        </button>
 
-    <button className="popup-item" onClick={onShare}>
-      <div className="popup-icon"><Share2 size={25} /></div>
-      <div className="popup-text">
-        <h3>Del</h3>
-        <p>Kopier link eller del med venner</p>
-      </div>
-    </button>
+        <button className="popup-item" onClick={onShare}>
+          <div className="popup-icon"><Share2 size={25} /></div>
+          <div className="popup-text">
+            <h3>Del playliste</h3>
+            <p>Kopier link eller del med venner</p>
+          </div>
+        </button>
 
-    <button className="popup-item" onClick={() => setShowConfirm(true)}>
-      <div className="popup-icon"><Trash2 size={25} /></div>
-      <div className="popup-text">
-        <h3>Slet playliste</h3>
-        <p>Fjern denne playliste permanent</p>
-      </div>
-    </button>
+        <button className="popup-item" onClick={() => setShowConfirm(true)}>
+          <div className="popup-icon"><Trash2 size={25} /></div>
+          <div className="popup-text">
+            <h3>Slet playliste</h3>
+            <p>Fjern denne playliste permanent</p>
+          </div>
+        </button>
+      </>
+    )}
+
+    {context === "song" && (
+      <>
+        <button className="popup-item" onClick={onShare}>
+          <div className="popup-icon"><Share2 size={25} /></div>
+          <div className="popup-text">
+            <h3>Del sang</h3>
+            <p>Send sangen til dine venner</p>
+          </div>
+        </button>
+
+        <button className="popup-item">
+          <div className="popup-icon"><Plus size={25} /></div>
+          <div className="popup-text">
+            <h3>Tilføj til anden playliste</h3>
+            <p>Gem denne sang et andet sted</p>
+          </div>
+        </button>
+
+        <button className="popup-item">
+          <div className="popup-icon"><Trash2 size={25} /></div>
+          <div className="popup-text">
+            <h3>Fjern fra denne playliste</h3>
+            <p>Slet sangen fra playlisten</p>
+          </div>
+        </button>
+      </>
+    )}
   </>
 )}
 
 {type === "share" && (
   <>
-    {/* SHARE / FRIENDS LIST */}
-    <h3 className="share-title">Del med venner</h3>
+    <h3 className="share-title">
+      {context === "song" ? "Del sang" : "Del playliste"}
+    </h3>
+    <p className="share-subtitle">
+      {context === "song"
+        ? `Vælg dem du vil sende sangen "${song?.title}" til:`
+        : `Vælg hvem du vil dele playlisten "${playlist?.name}" med:`}
+    </p>
+
     <div className="friends-list">
       {dummyFriends.map((friend) => (
         <div
@@ -182,11 +253,6 @@ const handleDelete = async () => {
         >
           <img src={friend.avatar} alt={friend.name} className="avatar" />
           <span>{friend.name}</span>
-          <button
-            className={`share-btn ${selectedFriends.includes(friend.id) ? "active" : ""}`}
-          >
-            {selectedFriends.includes(friend.id) ? "Valgt" : "Del"}
-          </button>
         </div>
       ))}
     </div>
@@ -194,10 +260,7 @@ const handleDelete = async () => {
     <button
       className="share-send"
       disabled={selectedFriends.length === 0}
-      onClick={() => {
-        console.log("Sendt til:", selectedFriends);
-        onClose();
-      }}
+      onClick={handleShare}
     >
       Send til {selectedFriends.length || 0} ven
       {selectedFriends.length !== 1 && "ner"}
@@ -207,7 +270,7 @@ const handleDelete = async () => {
       Annuller
     </button>
   </>
-    )}
+)}
       </div>
 
 
