@@ -131,7 +131,7 @@ export default function LibraryPage() {
 
          <div className={`playlist-list ${viewMode}`}>
         {filteredPlaylists.map((playlist) => (
-          <div key={playlist.id} className="library-playlist-card" onClick={() => navigate(`/playlist/${playlist.id}`)}>
+          <div key={playlist.id} className="library-playlist-card" onClick={() => navigate(`/playlist/${playlist.id}`, { state: { origin: "library" } })}>
             <img src={playlist.coverUrl} alt={playlist.name} className="cover" />
             
             <div className="info">
