@@ -6,8 +6,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import OnboardingPage from "./pages/OnboardingPage";
 import LibraryPage from "./pages/LibraryPage";
 import Opret from "./components/Opret";
-
-// 🔥 Wrapped sider
 import WrappedWeek from "./pages/WrappedWeek";
 import WrappedMonth from "./pages/WrappedMonth";
 
