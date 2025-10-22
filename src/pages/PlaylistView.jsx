@@ -15,8 +15,7 @@ export default function PlaylistView() {
     const location = useLocation();
     const navigate = useNavigate();
     const commentSectionRef = useRef(null);
-    const isFeedView = location.pathname.includes("/feed");
-    const collectionName = isFeedView ? "posts" : "playlists";
+   
 
     // states
     const [playlist, setPlaylist] = useState(null);
@@ -27,6 +26,13 @@ export default function PlaylistView() {
     const [popupType, setPopupType] = useState(null);
     const [popupContext, setPopupContext] = useState(null);
     const [selectedSong, setSelectedSong] = useState(null);
+    const isOwnPlaylist = playlist?.userId === auth.currentUser?.uid;
+
+    const origin = location.state?.origin || "library"; 
+    const isFeedView = origin === "feed";
+    const isSharedView = origin === "shared";
+    const isLibraryView = origin === "library";
+    const collectionName = isFeedView ? "posts" : "playlists";
 
     // fetch playliste fra firebase
     useEffect(() => {
@@ -133,6 +139,7 @@ export default function PlaylistView() {
         }
     };
 
+    // Beregner tidspunkt kommentar er skrevet
     function timeSince(timestamp) {
         if (!timestamp?.seconds) return "lige nu";
         const seconds = Math.floor((Date.now() - timestamp.seconds * 1000) / 1000);
@@ -151,6 +158,7 @@ export default function PlaylistView() {
         }
         return "for få sek siden";
     }
+
 
     const toggleLike = async (comment) => {
         const user = auth.currentUser;
@@ -222,6 +230,31 @@ export default function PlaylistView() {
         }
     };  
 
+    const togglePlaylistLike = async () => {
+        const user = auth.currentUser;
+        if (!user || !playlist) return;
+
+        try {
+            const playlistRef = doc(db, "posts", id); // eller "playlists" hvis det er fra library
+            const hasLiked = playlist.likedBy?.includes(user.uid);
+
+            await updateDoc(playlistRef, {
+            likedBy: hasLiked ? arrayRemove(user.uid) : arrayUnion(user.uid),
+            likes: hasLiked ? increment(-1) : increment(1),
+            });
+
+            setPlaylist((prev) => ({
+            ...prev,
+            likedBy: hasLiked
+                ? prev.likedBy.filter((uid) => uid !== user.uid)
+                : [...(prev.likedBy || []), user.uid],
+            likes: (prev.likes || 0) + (hasLiked ? -1 : 1),
+            }));
+        } catch (err) {
+            console.error("Fejl ved like af playliste:", err);
+        }
+};
+
 
     return(
         <div className="playlist-view">
@@ -242,8 +275,19 @@ export default function PlaylistView() {
                 <div className="playlist-btns">
                     <span><PlayIcon/></span>
                     <ShuffleIcon />
-                    <Heart/>
+                    <Heart onClick={() => {
+                        if (isLibraryView || isOwnPlaylist) {
+                        alert("Du kan ikke like din egen playliste.");
+                        return;
+                        }
+                        togglePlaylistLike(); // vi laver denne funktion lige nedenfor
+                    }}
+                    fill={!isOwnPlaylist && playlist?.likedBy?.includes(auth.currentUser?.uid) ? "red" : "none"}
+                    color={!isOwnPlaylist && playlist?.likedBy?.includes(auth.currentUser?.uid) ? "red" : "#fff"}
+                    style={{ cursor: isOwnPlaylist ? "not-allowed" : "pointer", opacity: isOwnPlaylist ? 0.5 : 1 }}/>
+
                     <Bookmark onClick={toggleSave} fill={isSaved ? "gold" : "none"}  color={isSaved ? "gold" : "#fff"}/>
+
                     <MessageCircle  onClick={() => {
                             commentSectionRef.current?.scrollIntoView({
                             behavior: "smooth",
@@ -305,7 +349,7 @@ export default function PlaylistView() {
             </div>
 
 
-           {isFeedView && (
+           {(isFeedView || isSharedView) && (
                 <div className="comment-section"  ref={commentSectionRef}>
                     <h3>Kommentarer</h3>
 
@@ -333,8 +377,8 @@ export default function PlaylistView() {
                             <div className="comment-actions">
                                 <button className={`like-btn ${c.likedBy?.includes(auth.currentUser?.uid) ? "liked" : ""}`} onClick={() => toggleLike(c)}>
                                 <Heart size={16}
-                                    fill={c.likedBy?.includes(auth.currentUser?.uid) ? "#e0e0e0" : "none"}
-                                    color={c.likedBy?.includes(auth.currentUser?.uid) ? "#e0e0e0" : "#e0e0e0"} />
+                                    fill={c.likedBy?.includes(auth.currentUser?.uid) ? "red" : "none"}
+                                    color={c.likedBy?.includes(auth.currentUser?.uid) ? "red" : "#e0e0e0"} />
                                 <span>{c.likes || 0}</span>
                                 </button>
                             </div>

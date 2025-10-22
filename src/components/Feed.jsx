@@ -241,7 +241,7 @@ export default function Feed() {
             <div
               key={post.id}
               className="flex-shrink-0 w-[220px] bg-[#1E1E1E] rounded-[18px] overflow-hidden cursor-pointer relative"
-              onClick={() => navigate(`/feed/playlist/${postRaw.id}`)}
+             onClick={() => navigate(`/playlist/${post.id}`, { state: { origin: "feed" } })}
             >
               <div className="relative">
                 {post.imgUrl ? (
