@@ -11,6 +11,7 @@ import MoodPage from "./pages/MoodPage";
 
 import WrappedWeek from "./pages/WrappedWeek";
 import WrappedMonth from "./pages/WrappedMonth";
+import ProfilePage from "./pages/ProfilePage";
 
 export default function App() {
   return (
@@ -31,6 +32,8 @@ export default function App() {
 
         {/* Library side */}
         <Route path="/library" element={<LibraryPage />} />
+
+        <Route path="/profile" element={<ProfilePage />} />
 
         <Route path="/playlist/:id" element={<PlaylistView />} />
         <Route path="/choose-mood" element={<MoodPage />} />

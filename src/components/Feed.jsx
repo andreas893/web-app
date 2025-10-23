@@ -268,7 +268,7 @@ export default function Feed() {
                     className="w-7 h-7 text-white cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
-                      alert(`Gå til ${post.user}'s profil`);
+                      navigate(`/profile/${post.userId}`);
                     }}
                   />
                   <Heart
