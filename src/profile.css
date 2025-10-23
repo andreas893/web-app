@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #121212;
+  --text-color: #E0E0E0;
+  --primary-color: #4D00FF;
+  --tetriary-color:#23262C;
+  --font-size-p:1.2rem;
+  --font-size-med:1.4rem;
+  --font-size-h2:1.6rem;
+  --font-size-h1:2.2rem;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* Skjul horizontale scrollbars på iOS/Chrome */
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }

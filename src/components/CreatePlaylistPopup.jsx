@@ -23,6 +23,7 @@ export default function CreatePlaylistPopup({ type = "create", onClose, playlist
 ];
 
 console.log("Origin:", location.state);
+console.log("🎧 Playlist objekt i popup:", playlist);
 
   // tjek om playliste/sang er pinned
   useEffect(() => {
@@ -33,7 +34,9 @@ console.log("Origin:", location.state);
     const snap = await getDoc(userRef);
     if (snap.exists()) {
       const pinned = snap.data().pinned || [];
-      setIsPinned(pinned.includes(playlist.id));
+      // her er forskellen ↓
+      const isThisPinned = pinned.some((p) => p.id === playlist.id);
+      setIsPinned(isThisPinned);
     }
   };
   checkPinned();
@@ -52,31 +55,75 @@ console.log("Origin:", location.state);
 
   // Gemmer pinned i databasen
   const togglePin = async () => {
-  const user = auth.currentUser;
-  if (!user || !playlist) return;
+      const user = auth.currentUser;
+      if (!user || !playlist) return;
 
-  try {
-    const userRef = doc(db, "users", user.uid);
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
 
-    if (isPinned) {
-      await updateDoc(userRef, {
-        pinned: arrayRemove(playlist.id),
-      });
-      console.log("📌 Fjernet pin:", playlist.name);
-      setIsPinned(false);
-    } else {
-      await updateDoc(userRef, {
-        pinned: arrayUnion(playlist.id),
-      });
-      console.log("📌 Tilføjet pin:", playlist.name);
-      setIsPinned(true);
-    }
+        if (!userSnap.exists()) return;
+        const userData = userSnap.data();
+        const currentPins = userData.pinned || [];
 
-    onClose();
-  } catch (err) {
-    console.error("Fejl ved toggle pin:", err);
-  }
+        // check om playlist allerede er pinned (ud fra id)
+        const alreadyPinned = currentPins.some((p) => p.id === playlist.id);
+
+        // fjern pin
+        if (alreadyPinned) {
+          const updatedPins = currentPins.filter((p) => p.id !== playlist.id);
+          await updateDoc(userRef, { pinned: updatedPins });
+          console.log("📌 Fjernet pin:", playlist.name);
+          setIsPinned(false);
+          onClose();
+          return;
+        }
+
+        // check max 4 pinned
+        if (currentPins.length >= 4) {
+          alert("Du kan maks have 4 pinned sange/playlister.");
+          return;
+        }
+
+       // vælg gyldig image-url (ingen fallback hvis der findes et billede)
+        const resolvedImg =
+          typeof playlist.imgUrl === "string" && playlist.imgUrl.trim() !== ""
+            ? playlist.imgUrl
+            : typeof playlist.image === "string" && playlist.image.trim() !== ""
+            ? playlist.image
+            : "/img/fallback.jpg"; // fallback kun hvis begge er tomme
+
+        // find korrekt brugernavn
+        const resolvedUser =
+          playlist.user ||
+          playlist.userName ||
+          playlist.createdBy ||
+          user.displayName ||
+          user.email?.split("@")[0] ||
+          "Ukendt bruger";
+
+        const pinnedData = {
+          id: playlist.id,
+          name: playlist.name || playlist.songName || "Ukendt titel",
+          imgUrl: resolvedImg,
+          user: resolvedUser,
+          source: context || "playlist",
+          timestamp: new Date().toISOString(),
+        };
+
+        // tilføj pin
+        const updatedPins = [...currentPins, pinnedData];
+        await updateDoc(userRef, { pinned: updatedPins });
+
+        console.log("📌 Tilføjet pin:", pinnedData.name);
+        setIsPinned(true);
+        onClose();
+      } catch (err) {
+        console.error("Fejl ved toggle pin:", err);
+      }
   };
+
+
 
 
   // Delete funktion
@@ -154,7 +201,7 @@ const handleShare = async () => {
   const newPlaylist = {
     userId: user.uid,
     user: user.displayName || user.email.split("@")[0],
-    name: name?.trim,
+    name: name?.trim(),
     imgUrl: cover || "/img/fallback.jpg",
     type,
     songs: [],
