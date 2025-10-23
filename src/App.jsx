@@ -7,6 +7,9 @@ import OnboardingPage from "./pages/OnboardingPage"
 import LibraryPage from "./pages/LibraryPage";
 import Opret from "./components/Opret";
 import PlaylistView from "./pages/PlaylistView";
+import MoodPage from "./pages/MoodPage";
+
+
 export default function App() {
   return (
     <main className="min-h-screen bg-black text-white">
@@ -28,7 +31,7 @@ export default function App() {
         <Route path="/library" element={<LibraryPage />} />
 
         <Route path="/playlist/:id" element={<PlaylistView />} />
-        <Route path="feed/playlist/:id" element={<PlaylistView />} />
+        <Route path="/choose-mood" element={<MoodPage />} />
 
         {/* Beskyttet side */}
         <Route

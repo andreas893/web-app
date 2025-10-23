@@ -75,7 +75,7 @@ export default function LibraryPage() {
 
     const combinedData = [...playlists, ...savedPlaylists.map((s) => ({
     id: s.id,
-    name: s.song || s.name || "Ukendt titel",
+    name: s.name || "Ukendt titel",
     createdBy: s.user || "Ukendt bruger",
     isMine: false,
     coverUrl: s.imgUrl || s.coverUrl || "https://via.placeholder.com/150",

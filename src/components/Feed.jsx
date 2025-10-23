@@ -182,6 +182,7 @@ export default function Feed() {
     await updateDoc(userRef, {
       playlists: arrayUnion({
         id: post.id,
+        name: post.name,
         song: post.song,
         user: post.user,
         imgUrl: post.imgUrl,
@@ -235,14 +236,18 @@ export default function Feed() {
             imgUrl: postRaw.imgUrl || postRaw.image || "/img/takecare.jpg",
             song: postRaw.song || postRaw.songName || "Ukendt sang",
             user: postRaw.user || postRaw.userName || "Ukendt bruger",
+            name: postRaw.name || "Ukendt titel",
           };
 
           return (
             <div
               key={post.id}
               className="flex-shrink-0 w-[220px] bg-[#1E1E1E] rounded-[18px] overflow-hidden cursor-pointer relative"
-             onClick={() => navigate(`/playlist/${post.id}`, { state: { origin: "feed" } })}
-            >
+             onClick={() =>
+                navigate(`/playlist/${post.id}`, {
+                  state: { origin: "feed" },
+                })}>
+
               <div className="relative">
                 {post.imgUrl ? (
                   <img
@@ -327,7 +332,7 @@ export default function Feed() {
 
               {/* Tekst under billede */}
               <div className="p-3">
-                <p className="text-sm font-semibold">{post.song}</p>
+                <p className="text-sm font-semibold">{post.name}</p>
                 <p className="text-xs text-gray-400">{post.user}</p>
               </div>
             </div>
