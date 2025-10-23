@@ -1,10 +1,11 @@
 // src/spotifyAuthPKCE.js
 
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-const redirectUri = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
 const scopes = import.meta.env.VITE_SPOTIFY_SCOPES;
 
-// 🔒 Helper: Lav kodeverifier og challenge
+/* --------------------------------------------------
+   🔒 Helper-funktioner
+-------------------------------------------------- */
 function base64encode(str) {
   return btoa(String.fromCharCode(...new Uint8Array(str)))
     .replace(/\+/g, "-")
@@ -18,8 +19,11 @@ async function generateCodeChallenge(codeVerifier) {
   return base64encode(digest);
 }
 
-// 🔐 Login-funktion
-export async function loginWithSpotify() {
+/* --------------------------------------------------
+   🚀 Login med valgfri redirect (default = /share)
+-------------------------------------------------- */
+export async function loginWithSpotify(redirectPath = "/share") {
+  const redirectUri = `${window.location.origin}${redirectPath}`;
   const codeVerifier = base64encode(crypto.getRandomValues(new Uint8Array(64)));
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
@@ -35,20 +39,17 @@ export async function loginWithSpotify() {
   });
 
   console.log("🚀 Redirecting to Spotify with:", Object.fromEntries(params));
-
   window.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
 }
 
-// 🎫 Byt authorization code til access token
+/* --------------------------------------------------
+   🎫 Byt authorization code til access token
+-------------------------------------------------- */
 export async function getSpotifyToken(code) {
   const codeVerifier = localStorage.getItem("spotify_code_verifier");
 
-  console.log("🧩 Sender til Spotify:", {
-    client_id: clientId,
-    code,
-    redirect_uri: redirectUri,
-    code_verifier: codeVerifier,
-  });
+  // Find redirect fra current location (så det også virker til fx /wrapped-week)
+  const redirectUri = window.location.origin + window.location.pathname;
 
   const body = new URLSearchParams({
     client_id: clientId,
