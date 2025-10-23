@@ -74,10 +74,10 @@ export default function ShareSong() {
     try {
       await addDoc(collection(db, "posts"), {
         userId: "testuser",
-        userName: "Testbruger",
-        songName: selectedSong.name,
+        user: "Testbruger",
+        name: selectedSong.name,
         artist: selectedSong.artists.map((a) => a.name).join(", "),
-        image: selectedSong.album.images[0]?.url || "",
+        imgUrl: selectedSong.album.images[0]?.url || "",
         comment: comment.trim(),
         timestamp: serverTimestamp(),
       });

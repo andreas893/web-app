@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, increment, arrayUnion, arrayRemove, updateDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 
-import { ArrowLeft, User, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp } from "lucide-react";
+import { ArrowLeft, User, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp, } from "lucide-react";
 import "../playlistView.css";
 import FooterNav from "../components/FooterNav";
 import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
@@ -28,28 +28,31 @@ export default function PlaylistView() {
     const [selectedSong, setSelectedSong] = useState(null);
     const isOwnPlaylist = playlist?.userId === auth.currentUser?.uid;
 
-    const origin = location.state?.origin || "library"; 
+   const origin = location.state?.origin || "unknown";
     const isFeedView = origin === "feed";
     const isSharedView = origin === "shared";
-    const isLibraryView = origin === "library";
+    const isLibraryView = origin === "library" || origin === "created";
     const collectionName = isFeedView ? "posts" : "playlists";
+
+    const showRecommended = isLibraryView && !isFeedView && !isSharedView;
+    
 
     // fetch playliste fra firebase
     useEffect(() => {
         const fetchPlaylist = async () => {
-            try {
-            const ref = doc(db, collectionName, id); // ← samme collection som i feed
+        try {
+            const ref = doc(db, collectionName, id);
             const snap = await getDoc(ref);
             if (snap.exists()) {
-                setPlaylist(snap.data());
+            setPlaylist({ id: snap.id, ...snap.data() });
             } else {
-                console.warn("Ingen playliste fundet med id:", id);
+            console.warn("Ingen playliste fundet med id:", id);
             }
-            } catch (err) {
+        } catch (err) {
             console.error("Fejl ved hentning:", err);
-            } finally {
+        } finally {
             setLoading(false);
-            }
+        }
         };
         fetchPlaylist();
     }, [id, collectionName]);
@@ -110,6 +113,11 @@ export default function PlaylistView() {
      { id: 1, title: playlist.song || "Ukendt sang", artist: playlist.user || "Ukendt kunstner", albumtitle: "Ukendt album", duration: "3:30" }
     ];
 
+    const recommendedSongs = [
+        { id: 1, title: "Drift", artist: "Soft Beats", coverUrl: "/img/song1.jpg" },
+        { id: 2, title: "Golden Hour", artist: "Dreamfield", coverUrl: "/img/song2.jpg" },
+        { id: 3, title: "Echoes", artist: "Cloud Club", coverUrl: "/img/song3.jpg" },
+    ];
     
     // funktion til at tilføje kommentarer
     const handleAddComment = async () => {
@@ -253,8 +261,14 @@ export default function PlaylistView() {
         } catch (err) {
             console.error("Fejl ved like af playliste:", err);
         }
-};
+    };
 
+    const handleAddSong = async (song) => {
+        const ref = doc(db, "playlists", id);
+        await updateDoc(ref, {
+            songs: arrayUnion(song)
+        });
+    };
 
     return(
         <div className="playlist-view">
@@ -264,8 +278,16 @@ export default function PlaylistView() {
                 <div className="playlist-overlay"></div>
 
                 <div className="playlist-hero-content">
-                    <ArrowLeft onClick={() => navigate(-1)}/>
-                    <h1 className="mood">{playlist.mood || "Ukendt stemning"}</h1>
+                    <div className="playlist-hero-btns">
+                         <ArrowLeft onClick={() => navigate("/library")} />
+                         <EllipsisVertical onClick={(e) => {
+                                e.stopPropagation();
+                                setPopupType("options")
+                                setPopupContext("playlist")
+                            }}/> 
+                    </div>
+                   
+                    <h1 className="mood">{playlist.mood || ""}</h1>
                     <h2 className="playlist-name">{playlist.name || playlist.song}</h2>
                     <p> <span className="user"><User /></span> {playlist.user || "Ukendt bruger"}s playliste</p>
                 </div>
@@ -318,33 +340,28 @@ export default function PlaylistView() {
 
                 </div>
 
-                <div className="recommended">
-                    <div className="recommended-text">
-                        <div>
-                            <h3>Anbefalede sange</h3>
-                            <p>Baseret på denne playliste</p>
+                                {showRecommended && (
+                    <div className="recommended">
+                        <div className="recommended-text">
+                        <h3>Anbefalede sange</h3>
+                        <RefreshCcwIcon />
                         </div>
-                        
-                        <div className="refresh-icon">
-                            <RefreshCcwIcon />
-                        </div>
-                    </div>
-
-                    <div className="playlist-content">
-                     {songs.map((song) => (
-                        <div key={song.id} className="playlist-song">
+                        <div className="playlist-content">
+                        {recommendedSongs.map((song) => (
+                            <div key={song.id} className="playlist-song">
                             <div className="song-info">
-                            <img src={playlist.imgUrl} alt="Cover" />
-                            <div className="song-text">
+                                <img src={song.coverUrl} alt={song.title} />
+                                <div className="song-text">
                                 <p className="song-title">{song.title}</p>
                                 <p className="song-artist">{song.artist}</p>
+                                </div>
                             </div>
+                            <CirclePlus onClick={() => handleAddSong(song)} />
                             </div>
-                            <CirclePlus />
+                        ))}
                         </div>
-                    ))}
                     </div>
-                </div>
+                    )}
 
             </div>
 
