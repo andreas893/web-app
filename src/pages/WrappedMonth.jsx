@@ -31,7 +31,7 @@ export default function WrappedMonth() {
       title: "Dit humør har ændret sig i løbet af måneden",
       subtitle: "Lad os se hvordan din musik rejse har udviklet sig",
     },
-    { title: "Tak fordi du kom med på turen 🎧", subtitle: "Kom igen næste måned!" },
+    { title: "Tak fordi du kom med på turen", subtitle: "Kom igen næste måned!" },
     { title: "Vil du dele din wrapped med dine venner?", button: "Del" },
   ];
 

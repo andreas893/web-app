@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import ShareSong from "./components/ShareSong";
+import SharePlaylist from "./pages/SharePlaylist";
 import Login from "./components/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OnboardingPage from "./pages/OnboardingPage";
@@ -21,7 +22,10 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
 
         {/* Dele en sang */}
-        <Route path="/share" element={<ShareSong />} />
+        <Route path="/share-song" element={<ShareSong />} />
+
+        {/* Dele en playliste */}
+        <Route path="/share-playlist" element={<SharePlaylist />} />
 
         {/* Login (til senere) */}
         <Route path="/login" element={<Login />} />

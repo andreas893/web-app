@@ -2,6 +2,7 @@
 
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const scopes = import.meta.env.VITE_SPOTIFY_SCOPES;
+const redirectUri = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
 
 /* --------------------------------------------------
    🔒 Helper-funktioner
@@ -20,10 +21,9 @@ async function generateCodeChallenge(codeVerifier) {
 }
 
 /* --------------------------------------------------
-   🚀 Login med valgfri redirect (default = /share)
+   🚀 Login med Spotify (nu altid via .env redirect)
 -------------------------------------------------- */
-export async function loginWithSpotify(redirectPath = "/share") {
-  const redirectUri = `${window.location.origin}${redirectPath}`;
+export async function loginWithSpotify() {
   const codeVerifier = base64encode(crypto.getRandomValues(new Uint8Array(64)));
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
@@ -47,9 +47,6 @@ export async function loginWithSpotify(redirectPath = "/share") {
 -------------------------------------------------- */
 export async function getSpotifyToken(code) {
   const codeVerifier = localStorage.getItem("spotify_code_verifier");
-
-  // Find redirect fra current location (så det også virker til fx /wrapped-week)
-  const redirectUri = window.location.origin + window.location.pathname;
 
   const body = new URLSearchParams({
     client_id: clientId,
