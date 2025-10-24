@@ -4,6 +4,7 @@ import { auth, db } from "../firebase";
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { Pencil, User, EllipsisVertical, ArrowRight} from 'lucide-react';
 import FooterNav from "../components/FooterNav";
+import StatsSection from "../components/StatsSection";
 import "../profile.css";
 import { useParams } from "react-router-dom";
 
@@ -173,29 +174,9 @@ export default function ProfilePage() {
             </div>
 
             {/* Kun på din egen profil */}
-            {/* {isOwnProfile && (
+            {isOwnProfile && (
                 <>
-                    <div className="stats">
-                        <div className="stat-heading">
-                            <h2>Statistikker</h2>
-                            <ArrowRight />
-                        </div>
-
-                        <div className="stats-container">
-                            <div className="stat-element">
-                                 <img src="" alt="" />
-                            </div>
-
-                            <div>
-                                <img src="" alt="" />
-                            </div>
-
-                            <div>
-                                <img src="" alt="" />
-                            </div>
-                        </div>
-                      
-                    </div>
+                    <StatsSection />
 
                     <div className="badges">
                         <div className="badges-heading">
@@ -204,13 +185,13 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="badge-list">
+                            {/* <div><img src="" alt="" /></div>
                             <div><img src="" alt="" /></div>
-                            <div><img src="" alt="" /></div>
-                            <div><img src="" alt="" /></div>
+                            <div><img src="" alt="" /></div> */}
                         </div>
                     </div>
                 </>
-            )} */}
+            )}
 
 
             <FooterNav />
