@@ -14,7 +14,7 @@ export default function ShareSong() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // 🔐 Hent access token automatisk, hvis Spotify redirecter tilbage med code
+  // 🔐 Når Spotify sender os tilbage med ?code=...
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
@@ -23,16 +23,19 @@ export default function ShareSong() {
       getSpotifyToken(code)
         .then((newToken) => {
           if (newToken) {
+            // gem token lokalt
             localStorage.setItem("spotify_access_token", newToken);
             setToken(newToken);
-            window.history.replaceState({}, document.title, "/share");
+
+            // fjern ?code=... fra URL'en og sørg for vi står på /share-song (din route)
+            window.history.replaceState({}, document.title, "/share-song");
           }
         })
         .catch((err) => console.error("Token fejl:", err));
     }
   }, [token]);
 
-  // 🎧 Hvis man åbner siden uden token, start Spotify-login automatisk
+  // 🎧 Hvis ingen token -> start Spotify login flow
   useEffect(() => {
     if (!token) {
       console.log("Ingen Spotify-token fundet — starter login...");
@@ -40,7 +43,7 @@ export default function ShareSong() {
     }
   }, [token]);
 
-  // 🎵 Søg i Spotify API
+  // 🎵 Søg tracks i Spotify
   const handleSearch = async () => {
     if (!query.trim()) return;
     setLoading(true);
@@ -48,9 +51,12 @@ export default function ShareSong() {
     try {
       const res = await fetch(
         `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
+      // token udløbet eller ugyldig
       if (res.status === 401) {
         console.warn("Token udløbet — logger ind igen...");
         localStorage.removeItem("spotify_access_token");
@@ -67,9 +73,12 @@ export default function ShareSong() {
     }
   };
 
-  // 💾 Del (midlertidig test uden login)
+  // 💾 Post til Firestore
   const handleShare = async () => {
-    if (!selectedSong) return alert("Vælg en sang først!");
+    if (!selectedSong) {
+      alert("Vælg en sang først!");
+      return;
+    }
 
     try {
       await addDoc(collection(db, "posts"), {
@@ -82,11 +91,14 @@ export default function ShareSong() {
         timestamp: serverTimestamp(),
       });
 
+      // ryd UI
       setQuery("");
       setComment("");
       setResults([]);
       setSelectedSong(null);
+
       alert("🎉 Sangen er delt!");
+      navigate("/"); // efter del -> hjem, kan ændres hvis du vil
     } catch (err) {
       console.error("Fejl ved deling:", err);
     }
@@ -94,7 +106,7 @@ export default function ShareSong() {
 
   return (
     <div className="relative min-h-screen bg-black text-white flex flex-col items-center p-6">
-      {/* 🔙 Luk */}
+      {/* Luk / gå tilbage */}
       <button
         onClick={() => navigate(-1)}
         className="absolute top-5 right-5 text-gray-300 hover:text-white transition"
@@ -102,9 +114,13 @@ export default function ShareSong() {
         <X size={28} />
       </button>
 
-      <h1 className="text-2xl font-bold mb-6 mt-2">Del sang</h1>
+      {/* Titel */}
+      <h1 className="text-2xl font-bold mb-2 mt-14">Del sang</h1>
+      <p className="text-gray-400 mb-6 text-center">
+        Søg efter en sang, du vil dele med dit netværk.
+      </p>
 
-      {/* 🔍 Søg */}
+      {/* Søg */}
       <input
         type="text"
         value={query}
@@ -112,15 +128,16 @@ export default function ShareSong() {
         placeholder="Søg efter en sang..."
         className="w-full max-w-md bg-[#1E1E1E] rounded-xl p-3 mb-3 text-white outline-none"
       />
+
       <button
         onClick={handleSearch}
         disabled={loading}
-        className="bg-purple-600 px-5 py-2 rounded-xl text-white font-semibold"
+        className="bg-[#4D00FF] px-5 py-2 rounded-xl text-white font-semibold w-full max-w-md disabled:opacity-60"
       >
         {loading ? "Søger..." : "Søg"}
       </button>
 
-      {/* 🎧 Resultater */}
+      {/* Resultater */}
       <div className="mt-6 w-full max-w-md space-y-3">
         {results.map((song) => (
           <div
@@ -128,7 +145,7 @@ export default function ShareSong() {
             onClick={() => setSelectedSong(song)}
             className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition ${
               selectedSong?.id === song.id
-                ? "bg-purple-600"
+                ? "bg-[#4D00FF]"
                 : "bg-[#1E1E1E] hover:bg-[#2A2A2A]"
             }`}
           >
@@ -147,7 +164,7 @@ export default function ShareSong() {
         ))}
       </div>
 
-      {/* 💬 Kommentar + del */}
+      {/* Kommentar + Del */}
       {selectedSong && (
         <div className="mt-6 w-full max-w-md">
           <textarea
@@ -156,9 +173,10 @@ export default function ShareSong() {
             onChange={(e) => setComment(e.target.value)}
             className="w-full bg-[#1E1E1E] rounded-xl p-3 text-white outline-none h-24 resize-none"
           />
+
           <button
             onClick={handleShare}
-            className="w-full mt-3 bg-purple-600 py-3 rounded-xl font-semibold"
+            className="w-full mt-3 bg-[#4D00FF] py-3 rounded-xl font-semibold"
           >
             Del
           </button>
