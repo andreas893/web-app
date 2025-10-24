@@ -22,3 +22,86 @@ body {
 /* Skjul horizontale scrollbars på iOS/Chrome */
 .hide-scroll::-webkit-scrollbar { display: none; }
 .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+
+
+
+
+
+
+/* Statistikker styling */
+.stats-section {
+  margin-top: 2rem;
+  color: #fff;
+}
+
+.stats-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.custom-tooltip {
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.tooltip-label {
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+.tooltip-value {
+  font-weight: 600;
+  color: #FFD633;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.stat-card {
+  border-radius: 20px;
+  padding: 1rem;
+  color: #000;
+  font-weight: 600;
+  overflow: hidden;
+}
+
+.stat-card h3 {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card.green {
+  background-color: #b5ff9c;
+  color: var(--tetriary-color);
+}
+
+.stat-card.dark {
+  background-color: #0f0f0f;
+  color: var(--text-color);
+}
+
+.stat-card.blue {
+  background-color: #92b7ff;
+  color: var(--tetriary-color);
+}
+
+.stat-card.yellow {
+  background-color: #fff585;
+  color: var(--tetriary-color);
+}
+
+.stat-card.pink {
+  background-color: #ffb6e3;
+  color: var(--tetriary-color);
+}
