@@ -23,16 +23,159 @@ body {
 .hide-scroll::-webkit-scrollbar { display: none; }
 .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
+.profile-page{
+  padding: 1rem;
+  color: var(--text-color);
+  padding-bottom: 80px;
+}
+
+.profile-header{
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  margin-bottom: 2rem;
+}
+
+.profile-pic{
+  position: relative;
+}
+
+.default-icon{
+  background-color: var(--text-color);
+  color: var(--tetriary-color);
+  width:100px;
+  padding: 1rem;
+  height: auto;
+  border-radius: 50%;
+}
+
+.pencil{
+  color: var(--tetriary-color);
+}
+
+.edit-icon{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translate(5%, 10%);
+  border-radius: 50%;
+  background: var(--text-color);
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--tetriary-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-meta{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+}
+
+.username{
+  justify-self: center;
+  align-items: end;
+  display: flex;
+  height: 100%;
+}
+
+.username h2{
+  font-size: var(--font-size-h2);
+}
+
+.followers{
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  justify-self: end;
+  height: 80%;
+}
+
+.options{
+  display: flex;
+  align-self: flex-start;
+}
 
 
 
+/* Styling af pinned */
+/* === PINNED SECTION === */
+.pinned {
+  display: flex;
+  flex-direction: column;
+}
 
+.pinned-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+   border-top: 1px solid var(--text-color);
+  border-bottom: 1px solid var(--text-color);
+}
+
+.pinned-heading h2 {
+  font-size: var(--font-size-h2);
+  color:var(--text-color);
+}
+
+/* === GRID / SCROLL === */
+.pinned-elements {
+  display: flex;
+  gap: 1rem;
+  padding-top: 0.8rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+.pinned-elements::-webkit-scrollbar {
+  display: none; /* ren look */
+}
+
+/* === CARD === */
+.pinned-card {
+  flex: 0 0 100px;
+  height: 130px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+/* === IMAGE === */
+.pinned-card img {
+  width: 100%;
+  height: 100px;
+  border-radius: 18px;
+  object-fit: cover;
+  margin-bottom: 0.3rem;
+}
+
+/* === TEXT === */
+.pinned-card p {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #fff;
+  opacity: 0.9;
+  margin-top: 0.2rem;
+  overflow: hidden;
+  /* text-overflow: ellipsis; */
+  white-space: nowrap;
+  max-width: 90%;
+}
 
 
 /* Statistikker styling */
 .stats-section {
   margin-top: 2rem;
-  color: #fff;
 }
 
 .stats-heading {
@@ -40,21 +183,19 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+   border-top: 1px solid var(--text-color);
+  border-bottom: 1px solid var(--text-color);
 }
 
-.custom-tooltip {
-  background: rgba(0,0,0,0.85);
-  color: #fff;
-  padding: 0.6rem 0.8rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  font-size: 0.75rem;
-  text-align: center;
+.stats-heading h2{
+  font-size: var(--font-size-h2);
 }
+
 
 .tooltip-label {
   opacity: 0.8;
   font-weight: 400;
+  
 }
 
 .tooltip-value {
@@ -64,21 +205,39 @@ body {
 
 .stats-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(2, 1fr); /* 2 kolonner */
+  gap: 0.8rem;
+}
+
+/* gør det 5. element fuldbredde */
+.stat-card:nth-child(5) {
+  grid-column: 1 / -1;
+  width: 100%;
 }
 
 .stat-card {
-  border-radius: 20px;
+  border-radius: 18px;
   padding: 1rem;
-  color: #000;
+  color: var(--tetriary-color);
   font-weight: 600;
-  overflow: hidden;
+  z-index: 10;
+  position: relative;
+}
+
+.stat-card.full-width {
+  grid-column: 1 / -1;   /* spænder fra første til sidste kolonne */
+  width: 100%;
 }
 
 .stat-card h3 {
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
+  pointer-events: none;
+}
+
+.stat-card svg,
+.stat-card canvas {
+  pointer-events: all; /* 👈 Recharts kan modtage mus events */
 }
 
 .stat-card.green {
@@ -104,4 +263,128 @@ body {
 .stat-card.pink {
   background-color: #ffb6e3;
   color: var(--tetriary-color);
+}
+
+/* styling af badges */
+.badges-section {
+  margin-top: 2rem;
+}
+
+.badges-heading h2{
+  font-size: var(--font-size-h2);
+}
+
+.badges-heading {
+   border-top: 1px solid var(--text-color);
+  border-bottom: 1px solid var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+/* --- Card layout --- */
+.badge-card {
+  background-color: #1c1e23;
+  border-radius: 20px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.badge-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.badge-card h4 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.badge-desc {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+/* --- Icon shape --- */
+.badge-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0.5rem auto;
+  border-radius: 12px;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Rank colors --- */
+.bronze .badge-icon {
+  background: linear-gradient(135deg, #8B5E3C, #C68A53);
+}
+
+.silver .badge-icon {
+  background: linear-gradient(135deg, #A7A9AC, #D9D9D9);
+}
+
+.gold .badge-icon {
+  background: linear-gradient(135deg, #E6B325, #FFD700);
+}
+
+.platinum .badge-icon {
+  background: linear-gradient(135deg, #BCC6CC, #E5E4E2);
+}
+
+.emerald .badge-icon {
+  background: linear-gradient(135deg, #5DBB63, #97E37A);
+}
+
+.diamond .badge-icon {
+  background: linear-gradient(135deg, #7ED6DF, #C4EAF2);
+}
+
+/* --- Progress bar --- */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #2b2e35;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 0.4rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4D00FF, #7A33FF);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.7rem;
+  margin-top: 0.25rem;
+  display: block;
+  opacity: 0.7;
+}
+
+.badge-card.completed .badge-icon {
+  box-shadow: 0 0 15px 2px rgba(111, 77, 255, 0.6);
+  transform: scale(1.05);
+}
+
+.recharts-tooltip-wrapper {
+  pointer-events: all !important;
+  z-index: 9999 !important;
 }

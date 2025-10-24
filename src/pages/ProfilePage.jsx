@@ -1,19 +1,30 @@
 import { useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { Pencil, User, EllipsisVertical, ArrowRight} from 'lucide-react';
 import FooterNav from "../components/FooterNav";
 import StatsSection from "../components/StatsSection";
+import BadgeCard from "../components/BadgeCard";
 import "../profile.css";
 import { useParams } from "react-router-dom";
 
 export default function ProfilePage() {
 
     const { id } = useParams();
+    const navigate = useNavigate();
     const profileUserId = id || auth.currentUser?.uid; // fallback til dig selv
     const [userData, setUserData] = useState(null);
     const isOwnProfile = auth.currentUser?.uid === profileUserId;
+
+    const badges = [
+    { title: "Bronze", description: "Lyt i 100 min", type: "Bronze", progress: 80, goal: 100 },
+    { title: "Sølv", description: "Udforsk 10 genrer", type: "Silver", progress: 50, goal: 100 },
+    { title: "Guld", description: "Opret 3 playlister", type: "Gold", progress: 60, goal: 100 },
+    { title: "Platinium", description: "Del 5 playlister", type: "Platinum", progress: 40, goal: 100 },
+    { title: "Emerald", description: "Opnå 50 følgere", type: "Emerald", progress: 70, goal: 100 },
+    { title: "Diamant", description: "Vær aktiv i 30 dage", type: "Diamond", progress: 30, goal: 100 },
+  ];
 
 
     // Useeffect til at checke om det er brugerens egen profil eller en anden brugers profil
@@ -93,6 +104,7 @@ export default function ProfilePage() {
             reader.readAsDataURL(file);
         };
 
+    
 
     return(
         <div className="profile-page">
@@ -102,13 +114,13 @@ export default function ProfilePage() {
                     {userData?.photoURL ? (
                         <img src={userData.photoURL} alt="Profilbillede" className="profile-img" />
                     ) : (
-                        <User className="default-icon" />
+                        <User className="default-icon" strokeWidth={1} />
                     )}
 
                     {isOwnProfile && (
                         <>
                         <label htmlFor="profile-upload" className="edit-icon">
-                            <Pencil size={18} />
+                            <Pencil className="pencil" size={18} />
                         </label>
                         <input
                             type="file"
@@ -122,7 +134,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="profile-meta">
-                    <h2>{userData?.username || userData?.user || "Ukendt bruger"}</h2>
+                    <div className="username"><h2>{userData?.username || userData?.user || "Ukendt bruger"}</h2></div>
 
                     <div className="followers">
                         <p>Følger: {userData?.following?.length || 0}</p>
@@ -155,9 +167,9 @@ export default function ProfilePage() {
 
 
             <div className="pinned">
-                <div>
+                <div className="pinned-heading">
                     <h2>Pinned</h2>
-                    <ArrowRight />
+                    <ArrowRight onClick={() => navigate("/pinned")} />
                 </div>
 
                <div className="pinned-elements">
@@ -178,16 +190,16 @@ export default function ProfilePage() {
                 <>
                     <StatsSection />
 
-                    <div className="badges">
+                    <div className="badges-section">
                         <div className="badges-heading">
                             <h2>Badges og Achievements</h2>
-                            <ArrowRight />
+                            <ArrowRight onClick={() => navigate("/badges")}/>
                         </div>
 
-                        <div className="badge-list">
-                            {/* <div><img src="" alt="" /></div>
-                            <div><img src="" alt="" /></div>
-                            <div><img src="" alt="" /></div> */}
+                        <div className="badges-grid">
+                            {badges.map((b) => (
+                            <BadgeCard key={b.title} {...b} />
+                            ))}
                         </div>
                     </div>
                 </>
