@@ -39,28 +39,28 @@ export default function LibraryPage() {
       name: "Morning Vibes",
       createdBy: "test5",
       isMine: true,
-      coverUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4",
+      imgUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4",
     },
     {
       id: "temp2",
       name: "Chill Evenings",
       createdBy: "mathias",
       isMine: false,
-      coverUrl: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2",
+      imgUrl: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2",
     }, 
      {
       id: "temp3",
       name: "Chill Evenings",
       createdBy: "mathias",
       isMine: false,
-      coverUrl: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2",
+      imgUrl: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2",
     }, 
      {
       id: "temp4",
       name: "Chill Evenings",
       createdBy: "mathias",
       isMine: false,
-      coverUrl: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2",
+      imgUrl: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2",
     },
   ];
 
@@ -75,10 +75,10 @@ export default function LibraryPage() {
 
     const combinedData = [...playlists, ...savedPlaylists.map((s) => ({
     id: s.id,
-    name: s.song || s.name || "Ukendt titel",
+    name: s.name || "Ukendt titel",
     createdBy: s.user || "Ukendt bruger",
     isMine: false,
-    coverUrl: s.imgUrl || s.coverUrl || "https://via.placeholder.com/150",
+    imgUrl: s.imgUrl || s.coverUrl || "https://via.placeholder.com/150",
   }))];
 
 
@@ -132,7 +132,7 @@ export default function LibraryPage() {
          <div className={`playlist-list ${viewMode}`}>
         {filteredPlaylists.map((playlist) => (
           <div key={playlist.id} className="library-playlist-card" onClick={() => navigate(`/playlist/${playlist.id}`, { state: { origin: "library" } })}>
-            <img src={playlist.coverUrl} alt={playlist.name} className="cover" />
+            <img src={playlist.imgUrl} alt={playlist.name} className="cover" />
             
             <div className="info">
               <h3>{playlist.name}</h3>

@@ -1,20 +1,29 @@
 import { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { Music, Sparkles, Users, Pin, Share2, Trash2, PinOff, AlertTriangle, Plus } from "lucide-react";
-import { updateDoc, doc, arrayUnion, arrayRemove, getDoc, deleteDoc } from "firebase/firestore";
+import { updateDoc, doc, arrayUnion, arrayRemove, getDoc, deleteDoc, addDoc, serverTimestamp, collection } from "firebase/firestore";
 import { db, auth } from "../firebase";
+import DetailsPopup from "../components/DetailsPopup"
+import { useNavigate } from "react-router";
 
-export default function CreatePlaylistPopup({ type = "create", onClose, onNavigate, playlist, onShare, context="playlist", song }) {
+export default function CreatePlaylistPopup({ type = "create", onClose, playlist, onShare, context="playlist", song }) {
   const popupRef = useRef(null);
   const [isPinned, setIsPinned] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState([]);
-
+  const [showDetails, setShowDetails] = useState(false);
+  const [createType, setCreateType] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const dummyFriends = [
   { id: "1", name: "Andreas", avatar: "/img/andreas.jpg" },
   { id: "2", name: "Mathias", avatar: "/img/mathias.jpg" },
   { id: "3", name: "Sofie", avatar: "/img/sofie.jpg" },
 ];
+
+console.log("Origin:", location.state);
+console.log("🎧 Playlist objekt i popup:", playlist);
 
   // tjek om playliste/sang er pinned
   useEffect(() => {
@@ -25,7 +34,9 @@ export default function CreatePlaylistPopup({ type = "create", onClose, onNaviga
     const snap = await getDoc(userRef);
     if (snap.exists()) {
       const pinned = snap.data().pinned || [];
-      setIsPinned(pinned.includes(playlist.id));
+      // her er forskellen ↓
+      const isThisPinned = pinned.some((p) => p.id === playlist.id);
+      setIsPinned(isThisPinned);
     }
   };
   checkPinned();
@@ -44,31 +55,75 @@ export default function CreatePlaylistPopup({ type = "create", onClose, onNaviga
 
   // Gemmer pinned i databasen
   const togglePin = async () => {
-  const user = auth.currentUser;
-  if (!user || !playlist) return;
+      const user = auth.currentUser;
+      if (!user || !playlist) return;
 
-  try {
-    const userRef = doc(db, "users", user.uid);
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
 
-    if (isPinned) {
-      await updateDoc(userRef, {
-        pinned: arrayRemove(playlist.id),
-      });
-      console.log("📌 Fjernet pin:", playlist.name);
-      setIsPinned(false);
-    } else {
-      await updateDoc(userRef, {
-        pinned: arrayUnion(playlist.id),
-      });
-      console.log("📌 Tilføjet pin:", playlist.name);
-      setIsPinned(true);
-    }
+        if (!userSnap.exists()) return;
+        const userData = userSnap.data();
+        const currentPins = userData.pinned || [];
 
-    onClose();
-  } catch (err) {
-    console.error("Fejl ved toggle pin:", err);
-  }
+        // check om playlist allerede er pinned (ud fra id)
+        const alreadyPinned = currentPins.some((p) => p.id === playlist.id);
+
+        // fjern pin
+        if (alreadyPinned) {
+          const updatedPins = currentPins.filter((p) => p.id !== playlist.id);
+          await updateDoc(userRef, { pinned: updatedPins });
+          console.log("📌 Fjernet pin:", playlist.name);
+          setIsPinned(false);
+          onClose();
+          return;
+        }
+
+        // check max 4 pinned
+        if (currentPins.length >= 4) {
+          alert("Du kan maks have 4 pinned sange/playlister.");
+          return;
+        }
+
+       // vælg gyldig image-url (ingen fallback hvis der findes et billede)
+        const resolvedImg =
+          typeof playlist.imgUrl === "string" && playlist.imgUrl.trim() !== ""
+            ? playlist.imgUrl
+            : typeof playlist.image === "string" && playlist.image.trim() !== ""
+            ? playlist.image
+            : "/img/fallback.jpg"; // fallback kun hvis begge er tomme
+
+        // find korrekt brugernavn
+        const resolvedUser =
+          playlist.user ||
+          playlist.userName ||
+          playlist.createdBy ||
+          user.displayName ||
+          user.email?.split("@")[0] ||
+          "Ukendt bruger";
+
+        const pinnedData = {
+          id: playlist.id,
+          name: playlist.name || playlist.songName || "Ukendt titel",
+          imgUrl: resolvedImg,
+          user: resolvedUser,
+          source: context || "playlist",
+          timestamp: new Date().toISOString(),
+        };
+
+        // tilføj pin
+        const updatedPins = [...currentPins, pinnedData];
+        await updateDoc(userRef, { pinned: updatedPins });
+
+        console.log("📌 Tilføjet pin:", pinnedData.name);
+        setIsPinned(true);
+        onClose();
+      } catch (err) {
+        console.error("Fejl ved toggle pin:", err);
+      }
   };
+
+
 
 
   // Delete funktion
@@ -139,13 +194,57 @@ const handleShare = async () => {
 };
 
 
+  async function handleCreatePlaylist({ name, cover }, type) {
+  const user = auth.currentUser;
+  if (!user) return alert("Du skal være logget ind for at oprette en playliste!");
+
+  const newPlaylist = {
+    userId: user.uid,
+    user: user.displayName || user.email.split("@")[0],
+    name: name?.trim(),
+    imgUrl: cover || "/img/fallback.jpg",
+    type,
+    songs: [],
+    timestamp: serverTimestamp(),
+  };
+
+  const docRef = await addDoc(collection(db, "playlists"), newPlaylist);
+
+   const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        playlists: arrayUnion({
+          id: docRef.id,
+          name: newPlaylist.name,
+          user: newPlaylist.user,
+          imgUrl: newPlaylist.imgUrl,
+          type: newPlaylist.type,
+        }),
+    });
+
+  navigate(`/playlist/${docRef.id}`, { state: { origin: "created" } });
+}
+
+  function handleCreateClick(type) {
+    setCreateType(type);
+    setShowDetails(true);
+  }
+
+
   return (
     <div className="popup-overlay">
       <div ref={popupRef} className="popup-container">
         {type === "create" && (
   <>
     {/* CREATE PLAYLIST */}
-    <button className="popup-item" onClick={() => onNavigate("/create-playlist")}>
+          <button className="popup-item" onClick={() => handleCreateClick("/choose-mood")}>
+          <div className="popup-icon"><Sparkles size={25} /></div>
+          <div className="popup-text">
+            <h3>Moodlist</h3>
+            <p>Opret en playliste ud fra dit humør</p>
+          </div>
+        </button>
+
+    <button className="popup-item" onClick={() => handleCreateClick("manual")}>
       <div className="popup-icon"><Music size={25} /></div>
       <div className="popup-text">
         <h3>Playliste</h3>
@@ -153,15 +252,8 @@ const handleShare = async () => {
       </div>
     </button>
 
-    <button className="popup-item" onClick={() => onNavigate("/moodlist")}>
-      <div className="popup-icon"><Sparkles size={25} /></div>
-      <div className="popup-text">
-        <h3>Moodlist</h3>
-        <p>Opret en playliste ud fra dit humør</p>
-      </div>
-    </button>
 
-    <button className="popup-item" onClick={() => onNavigate("/shared-playlist")}>
+    <button className="popup-item" onClick={() => handleCreateClick("/shared-playlist")}>
       <div className="popup-icon"><Users size={25} /></div>
       <div className="popup-text">
         <h3>Fælles playliste</h3>
@@ -170,6 +262,14 @@ const handleShare = async () => {
     </button>
   </>
 )}
+
+  {showDetails && (
+      <DetailsPopup
+        type={createType}
+        onClose={() => setShowDetails(false)}
+        onConfirm={(data) => handleCreatePlaylist(data, createType)}
+      />
+    )}
 
 {type === "options" && (
   <>
@@ -181,7 +281,7 @@ const handleShare = async () => {
           </div>
           <div className="popup-text">
             <h3>{isPinned ? "Fjern pin" : "Pin playliste"}</h3>
-            <p>{isPinned ? "Fjern playlisten fra dine pinned" : "Fastgør denne playliste øverst"}</p>
+            <p>{isPinned ? "Fjern playlisten fra dine pinned" : "Fastgør denne playliste på profil"}</p>
           </div>
         </button>
 
@@ -217,7 +317,7 @@ const handleShare = async () => {
           <div className="popup-icon"><Plus size={25} /></div>
           <div className="popup-text">
             <h3>Tilføj til anden playliste</h3>
-            <p>Gem denne sang et andet sted</p>
+            <p>Gem denne sang på en anden playliste</p>
           </div>
         </button>
 

@@ -7,8 +7,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import OnboardingPage from "./pages/OnboardingPage";
 import LibraryPage from "./pages/LibraryPage";
 import Opret from "./components/Opret";
+import PlaylistView from "./pages/PlaylistView";
+import MoodPage from "./pages/MoodPage";
+
 import WrappedWeek from "./pages/WrappedWeek";
 import WrappedMonth from "./pages/WrappedMonth";
+import ProfilePage from "./pages/ProfilePage";
 
 export default function App() {
   return (
@@ -33,6 +37,10 @@ export default function App() {
         {/* Library side */}
         <Route path="/library" element={<LibraryPage />} />
 
+        <Route path="/profile" element={<ProfilePage />} />
+
+        <Route path="/playlist/:id" element={<PlaylistView />} />
+        <Route path="/choose-mood" element={<MoodPage />} />
         {/* Wrapped sider */}
         <Route path="/wrapped-week" element={<WrappedWeek />} />
         <Route path="/wrapped-month" element={<WrappedMonth />} />

@@ -82,11 +82,11 @@ export default function ShareSong() {
 
     try {
       await addDoc(collection(db, "posts"), {
-        userId: "testuser", // TODO: byt til rigtig auth user
-        userName: "Testbruger",
-        songName: selectedSong.name,
+        userId: "testuser",
+        user: "Testbruger",
+        name: selectedSong.name,
         artist: selectedSong.artists.map((a) => a.name).join(", "),
-        image: selectedSong.album.images[0]?.url || "",
+        imgUrl: selectedSong.album.images[0]?.url || "",
         comment: comment.trim(),
         timestamp: serverTimestamp(),
       });
