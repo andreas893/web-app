@@ -236,6 +236,7 @@ const handleShare = async () => {
         {type === "create" && (
   <>
     {/* CREATE PLAYLIST */}
+           <div className="popup-handle"></div>
           <button className="popup-item" onClick={() => handleCreateClick("/choose-mood")}>
           <div className="popup-icon"><Sparkles size={25} /></div>
           <div className="popup-text">
@@ -275,6 +276,7 @@ const handleShare = async () => {
   <>
     {context === "playlist" && (
       <>
+         <div className="popup-handle"></div>
         <button className="popup-item" onClick={togglePin}>
           <div className="popup-icon">
             {isPinned ? <PinOff size={25} /> : <Pin size={25} />}
@@ -335,6 +337,7 @@ const handleShare = async () => {
 
 {type === "share" && (
   <>
+     <div className="popup-handle"></div>
     <h3 className="share-title">
       {context === "song" ? "Del sang" : "Del playliste"}
     </h3>
