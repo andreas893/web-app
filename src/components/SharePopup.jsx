@@ -35,6 +35,7 @@ export default function SharePopup({ onClose }) {
 
           {/* Valg */}
           <div className="space-y-3">
+            {/* DEL PLAYLISTE */}
             <div
               className="flex items-center gap-4 p-4 bg-[#2A2A2A] rounded-2xl cursor-pointer hover:bg-[#333333] transition"
               onClick={() => {
@@ -53,11 +54,12 @@ export default function SharePopup({ onClose }) {
               </div>
             </div>
 
+            {/* DEL SANG */}
             <div
               className="flex items-center gap-4 p-4 bg-[#2A2A2A] rounded-2xl cursor-pointer hover:bg-[#333333] transition"
               onClick={() => {
                 onClose();
-                navigate("/share-song");
+                navigate("/share-song?autoLogin=true");
               }}
             >
               <div className="bg-white text-[#1E1E1E] p-3 rounded-full">

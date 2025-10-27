@@ -2,7 +2,9 @@
 
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const scopes = import.meta.env.VITE_SPOTIFY_SCOPES;
-const redirectUri = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
+
+// 🧭 Dynamisk redirect baseret på hvor appen kører
+const redirectUri = `${window.location.origin}/share-song`;
 
 /* --------------------------------------------------
    🔒 Helper-funktioner
@@ -21,7 +23,7 @@ async function generateCodeChallenge(codeVerifier) {
 }
 
 /* --------------------------------------------------
-   🚀 Login med Spotify (nu altid via .env redirect)
+   🚀 Login med Spotify
 -------------------------------------------------- */
 export async function loginWithSpotify() {
   const codeVerifier = base64encode(crypto.getRandomValues(new Uint8Array(64)));
@@ -38,7 +40,7 @@ export async function loginWithSpotify() {
     code_challenge: codeChallenge,
   });
 
-  console.log("🚀 Redirecting to Spotify with:", Object.fromEntries(params));
+  console.log("🚀 Redirecting to Spotify with:", redirectUri);
   window.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
 }
 
