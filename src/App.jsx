@@ -9,11 +9,11 @@ import LibraryPage from "./pages/LibraryPage";
 import Opret from "./components/Opret";
 import PlaylistView from "./pages/PlaylistView";
 import MoodPage from "./pages/MoodPage";
-
 import WrappedWeek from "./pages/WrappedWeek";
 import WrappedMonth from "./pages/WrappedMonth";
 import ProfilePage from "./pages/ProfilePage";
 import PinnedPage from "./pages/PinnedPage";
+import StatisticsPage from "./pages/StatisticsPage";
 
 export default function App() {
   return (
@@ -40,6 +40,7 @@ export default function App() {
 
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/pinned" element={<PinnedPage />} />
+        <Route path="/stats" element={<StatisticsPage />} />
 
         <Route path="/playlist/:id" element={<PlaylistView />} />
         <Route path="/choose-mood" element={<MoodPage />} />

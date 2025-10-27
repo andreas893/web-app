@@ -55,7 +55,7 @@ export default function PinnedPage() {
                 <div className="pin-text">
                     <h1 className="pinned-title">Pinned</h1>
                     <p className="pinned-subtitle">
-                        Vælg de albums eller playlister, der repræsenterer dig bedst.
+                        Fremhæv den musik, der repræsenterer dig bedst.
                     </p>
                 </div>
                 
