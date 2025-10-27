@@ -8,6 +8,7 @@ import StatsSection from "../components/StatsSection";
 import BadgeCard from "../components/BadgeCard";
 import "../profile.css";
 import { useParams } from "react-router-dom";
+import ProfileOptionsPopup from "../components/ProfileOptions";
 
 export default function ProfilePage() {
 
@@ -16,6 +17,7 @@ export default function ProfilePage() {
     const profileUserId = id || auth.currentUser?.uid; // fallback til dig selv
     const [userData, setUserData] = useState(null);
     const isOwnProfile = auth.currentUser?.uid === profileUserId;
+    const [showOptions, setShowOptions] = useState(false);
 
     const badges = [
     { title: "Bronze", description: "Lyt i 100 min", type: "Bronze", progress: 80, goal: 100 },
@@ -159,7 +161,7 @@ export default function ProfilePage() {
                 </div>
 
                 {isOwnProfile && (
-                    <div className="options">
+                    <div className="options" onClick={() => setShowOptions(true)}>
                     <EllipsisVertical />
                     </div>
                 )}
@@ -205,6 +207,16 @@ export default function ProfilePage() {
                 </>
             )}
 
+
+
+            {showOptions && (
+                <ProfileOptionsPopup
+                    onClose={() => setShowOptions(false)}
+                    onEdit={() => {
+                    setShowOptions(false);
+                    }}
+                />
+            )}
 
             <FooterNav />
         </div>
