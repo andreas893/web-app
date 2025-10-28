@@ -14,6 +14,7 @@ import WrappedMonth from "./pages/WrappedMonth";
 import ProfilePage from "./pages/ProfilePage";
 import PinnedPage from "./pages/PinnedPage";
 import StatisticsPage from "./pages/StatisticsPage";
+import BadgePage from "./pages/BadgePage";
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/pinned" element={<PinnedPage />} />
         <Route path="/stats" element={<StatisticsPage />} />
+        <Route path="/badges" element={<BadgePage />} />
 
         <Route path="/playlist/:id" element={<PlaylistView />} />
         <Route path="/choose-mood" element={<MoodPage />} />

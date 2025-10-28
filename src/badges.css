@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #121212;
+  --text-color: #E0E0E0;
+  --primary-color: #4D00FF;
+  --tetriary-color:#23262C;
+  --font-size-p:1.2rem;
+  --font-size-med:1.4rem;
+  --font-size-h2:1.6rem;
+  --font-size-h1:2.2rem;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* Skjul horizontale scrollbars på iOS/Chrome */
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+
+.badge-page{
+  padding:1rem;
+  padding-bottom: 80px;
+}
+
+.back-arrow{
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-text{
+    margin-top: 1rem;
+}
+
+.badge-text p{
+    font-size: var(--font-size-p);
+}
+
+.badge-page-heading h1 {
+  font-size: var(--font-size-h1);
+}
+
+.progress{
+  margin-top: 2rem;
+}
+
+.progress h2{
+  font-size: var(--font-size-h2);
+}
+
+.badges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 1rem;                              
+  justify-items: center;                  
+  align-items: stretch;                 
+  margin-top: 1rem;
+}
+
+.badge-cards {
+  width: 100%;
+  display: contents;
+}
+
+
+
+.badge-card {
+  padding: 1rem;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.badge-category{
+  margin-top: 2rem;
+}
+
+.badge-category h2{
+  font-size: var(--font-size-h2);
+}
+
+/* styling af kategorier */
+.scroll-stack-scroller{
+  margin-top: 2rem;
+}
+
+.category-card {
+  height: auto;
+  min-height: 24rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  color: var(--text-color);
+}
+
+.category-card-inner {
+  padding: 1rem;
+  border-radius: 18px;
+  height: 100%;
+}
+
+.category-header{
+  display: flex;
+  align-items: center;
+  color: var(--tetriary-color);
+  gap: 0.5rem ;
+  margin-bottom: 0.5rem;
+}
+
+.category-header h3 {
+  font-size: var(--font-size-med);
+  color: var(--tetriary-color);
+}
+
+.category-badges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+}
+
+.scroll-stack-card {
+  will-change: transform;
+  backface-visibility: hidden;
+  contain: layout paint size style; /* reducerer lagging */
+  transition: transform 0.2s ease-out, filter 0.2s ease-out;
+}
