@@ -27,6 +27,7 @@ body {
 .badge-page{
   padding:1rem;
   padding-bottom: 80px;
+  background-color: var(--bg);
 }
 
 .back-arrow{

@@ -31,6 +31,7 @@ body {
     display: flex;
     flex-direction: column;
     padding-bottom: 49px;
+    background-color: var(--bg);
 }
 
 .playlist-hero{

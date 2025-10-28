@@ -30,7 +30,7 @@ body {
   flex-direction: column;
   gap: 2rem;
   color: var(--text-color);
-
+background-color: var(--bg);
   padding-bottom: 80px;
 }
 

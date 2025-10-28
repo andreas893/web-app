@@ -287,8 +287,8 @@ export default function PlaylistView() {
                             }}/> 
                     </div>
                    
-                    <h1 className="mood">{playlist.mood || ""}</h1>
-                    <h2 className="playlist-name">{playlist.name || playlist.song}</h2>
+                    <h1 className="playlist-name">{playlist.name || playlist.song}</h1>
+                    <h2 className="mood">{playlist.mood || ""}</h2>
                     <p> <span className="user"><User /></span> {playlist.user || "Ukendt bruger"}s playliste</p>
                 </div>
             </div>
