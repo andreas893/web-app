@@ -224,10 +224,15 @@ const handleShare = async () => {
   navigate(`/playlist/${docRef.id}`, { state: { origin: "created" } });
 }
 
-  function handleCreateClick(type) {
+ function handleCreateClick(type) {
+  if (type === "/choose-mood") {
+    onClose(); // luk popup først
+    navigate(type); // gå direkte til mood-siden
+  } else {
     setCreateType(type);
     setShowDetails(true);
   }
+}
 
 
   return (
