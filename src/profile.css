@@ -27,6 +27,7 @@ body {
   padding: 1rem;
   color: var(--text-color);
   padding-bottom: 80px;
+  background-color: var(--bg);
 }
 
 .profile-header{
@@ -468,6 +469,7 @@ body {
   padding: 1rem;
   color: var(--text-color);
   padding-bottom: 80px;
+  background-color: var(--bg);
 }
 
 .pin-text{

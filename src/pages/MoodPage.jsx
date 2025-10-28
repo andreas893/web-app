@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { doc, updateDoc, addDoc, collection, serverTimestamp, arrayUnion } from "firebase/firestore";
 import { auth, db } from "../firebase";
-import "../moodPage.css"
+import CreatePlaylistDetailsPopup from "../components/DetailsPopup";
+import "../moodPage.css";
 
 const moods = [
   { name: "Glad", color: "#FFD633" },
@@ -15,28 +16,35 @@ const moods = [
   { name: "Fokuseret", color: "#2E4C8C" },
 ];
 
-export default function StepGenre() {
+export default function MoodPage() {
   const [selectedMood, setSelectedMood] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
   const navigate = useNavigate();
 
-   // Brugeren kan kun vælge ét mood
+  // Brugeren kan kun vælge ét mood
   function toggleMood(mood) {
     setSelectedMood((prev) => (prev === mood ? null : mood));
   }
 
-  async function handleContinue() {
+  // Når brugeren klikker "Opret Moodlist"
+  function handleContinue() {
+    if (!selectedMood) return;
+    setShowDetails(true);
+  }
+
+  // Når brugeren bekræfter i DetailsPopup
+  async function handleConfirmDetails({ name, cover }) {
     const user = auth.currentUser;
     if (!user) return alert("Du skal være logget ind for at fortsætte!");
 
     try {
-      // 🔹 1. Opret playlisten i Firestore
       const newPlaylist = {
         userId: user.uid,
         user: user.displayName || user.email.split("@")[0],
-        name: `${selectedMood} Moodlist`,
+        name: name?.trim() || `${selectedMood} Moodlist`,
         mood: selectedMood,
         type: "mood",
-        imgUrl: "/img/mood-cover.jpg",
+        imgUrl: cover || "/img/mood-cover.jpg",
         songs: [
           { id: 1, title: "Evening Reflections", artist: "Soft Haze", duration: "3:42" },
           { id: 2, title: "Waves of Calm", artist: "Lucid Dreams", duration: "4:10" },
@@ -47,9 +55,10 @@ export default function StepGenre() {
         timestamp: serverTimestamp(),
       };
 
+      // 🔹 Opret playlisten i Firestore
       const docRef = await addDoc(collection(db, "playlists"), newPlaylist);
 
-      // 🔹 2. Gem i brugerens library
+      // 🔹 Tilføj til brugerens dokument
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         playlists: arrayUnion({
@@ -62,7 +71,7 @@ export default function StepGenre() {
         }),
       });
 
-      // 🔹 3. Navigér til playlistens side
+      setShowDetails(false);
       navigate(`/playlist/${docRef.id}`, { state: { origin: "created" } });
     } catch (err) {
       console.error("Fejl ved oprettelse af moodlist:", err);
@@ -119,9 +128,17 @@ export default function StepGenre() {
         Opret Moodlist
       </button>
 
-     <button className="back-btn" onClick={handleBack}>
+      <button className="back-btn" onClick={handleBack}>
         Annullér
-     </button>
+      </button>
+
+      {/* 🔹 Details-popup åbnes her */}
+      {showDetails && (
+        <CreatePlaylistDetailsPopup
+          onClose={() => setShowDetails(false)}
+          onConfirm={handleConfirmDetails}
+        />
+      )}
     </div>
   );
 }
