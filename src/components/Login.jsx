@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup, FacebookAuthProvider, signInWithEmailAndPassword } from "firebase/auth";
+import { loginWithSpotify, getSpotifyToken } from "../spotifyAuthPKCE";
 import { auth, db } from "../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import "../login.css";
@@ -10,6 +11,32 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  // håndter redirect fra Spotify
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    // Kun forsøg udveksling hvis vi har code og ingen token i forvejen
+    if (code && !localStorage.getItem("spotify_access_token")) {
+      (async () => {
+        try {
+          const token = await getSpotifyToken(code);
+          if (token) {
+            localStorage.setItem("spotify_access_token", token);
+            // Rens URL'en for ?code=...
+            window.history.replaceState({}, document.title, "/login");
+            console.log("✅ Spotify token gemt");
+          } else {
+            console.warn("❌ Fik ikke token fra Spotify");
+          }
+        } catch (e) {
+          console.error("Spotify token-fejl:", e);
+        }
+      })();
+    }
+  }, []);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -48,7 +75,7 @@ export default function Login() {
       console.log("logget ind med google");
       navigate("/");      
     } catch (error) {
-      console.error("facebook-login fejl", error.message);
+      console.error("Google-login fejl", error.message);
       setError("Noget gik galt med Facebook-login.");
     }
   };
@@ -65,13 +92,11 @@ export default function Login() {
     }
   };
 
-  const handleSpotifyLogin = () =>{
-    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-    const redirectUri = window.location.origin + "/";
-    const scopes = "user-read-email user-read-private";
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${redirectUri}&scope=${scopes}`;
-    window.location.href = authUrl;
-  }
+  // Start PKCE-flow med jeres helper (bruger VITE_SPOTIFY_REDIRECT_URI)
+  const handleSpotifyLogin = () => {
+    // Denne kalder authorize med code_challenge + redirect til VITE_SPOTIFY_REDIRECT_URI
+    loginWithSpotify();
+  };
 
   return (
      <div className="login-page">

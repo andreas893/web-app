@@ -1,14 +1,26 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRef } from "react";
 import { doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, increment, arrayUnion, arrayRemove, updateDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
+import { fetchSpotifyRecommendations } from "../spotifyApi";
 
 import { ArrowLeft, User, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp, } from "lucide-react";
 import "../playlistView.css";
 import FooterNav from "../components/FooterNav";
 import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
 
+ // spotify recommended fetch, map moods til spotify-genrer
+    const moodToGenre = {
+        Glad: "pop",
+        Trist: "sad",
+        Chill: "chill",
+        Energisk: "dance",
+        Kreativ: "indie",
+        Forelsket: "romance",
+        Fokuseret: "study",
+        Vred: "metal",
+        };
 
 export default function PlaylistView() {
     const { id } = useParams();
@@ -27,6 +39,7 @@ export default function PlaylistView() {
     const [popupContext, setPopupContext] = useState(null);
     const [selectedSong, setSelectedSong] = useState(null);
     const isOwnPlaylist = playlist?.userId === auth.currentUser?.uid;
+    const [recommendedSongs, setRecommendedSongs] = useState([]);
 
    const origin = location.state?.origin || "unknown";
     const isFeedView = origin === "feed";
@@ -36,6 +49,33 @@ export default function PlaylistView() {
 
     const showRecommended = isLibraryView && !isFeedView && !isSharedView;
     
+    
+    const fetchRecommendedSongs = useCallback(async () => {
+    if (!playlist?.mood) return;
+
+    try {
+      const token = localStorage.getItem("spotify_access_token");
+      if (!token) {
+        console.warn("Ingen Spotify-token — springer anbefalinger over.");
+        return;
+      }
+
+      const genre = moodToGenre[playlist.mood] || "pop";
+      const recs = await fetchSpotifyRecommendations(token, genre);
+      setRecommendedSongs(recs);
+    } catch (err) {
+      console.error("Kunne ikke hente Spotify-sange:", err);
+    }
+  }, [playlist?.mood]);
+
+  // useEffect der henter anbefalinger når playlist er hentet
+  useEffect(() => {
+    if (showRecommended) {
+      fetchRecommendedSongs();
+    }
+  }, [showRecommended, fetchRecommendedSongs]);
+
+
 
     // fetch playliste fra firebase
     useEffect(() => {
@@ -56,6 +96,7 @@ export default function PlaylistView() {
         };
         fetchPlaylist();
     }, [id, collectionName]);
+
 
     // fetch kommentarer i realtime
     useEffect(() => {
@@ -113,11 +154,7 @@ export default function PlaylistView() {
      { id: 1, title: playlist.song || "Ukendt sang", artist: playlist.user || "Ukendt kunstner", albumtitle: "Ukendt album", duration: "3:30" }
     ];
 
-    const recommendedSongs = [
-        { id: 1, title: "Drift", artist: "Soft Beats", coverUrl: "/img/song1.jpg" },
-        { id: 2, title: "Golden Hour", artist: "Dreamfield", coverUrl: "/img/song2.jpg" },
-        { id: 3, title: "Echoes", artist: "Cloud Club", coverUrl: "/img/song3.jpg" },
-    ];
+
     
     // funktion til at tilføje kommentarer
     const handleAddComment = async () => {
@@ -340,27 +377,32 @@ export default function PlaylistView() {
 
                 </div>
 
-                                {showRecommended && (
-                    <div className="recommended">
-                        <div className="recommended-text">
-                        <h3>Anbefalede sange</h3>
-                        <RefreshCcwIcon />
-                        </div>
-                        <div className="playlist-content">
-                        {recommendedSongs.map((song) => (
-                            <div key={song.id} className="playlist-song">
-                            <div className="song-info">
-                                <img src={song.coverUrl} alt={song.title} />
-                                <div className="song-text">
-                                <p className="song-title">{song.title}</p>
-                                <p className="song-artist">{song.artist}</p>
+                    {showRecommended && (
+                        <div className="recommended">
+                            <div className="recommended-text">
+                            <h3>Anbefalede sange</h3>
+                            <RefreshCcwIcon onClick={fetchRecommendedSongs} className="refresh-btn" />
+                            </div>
+
+                            <div className="playlist-content">
+                            {(recommendedSongs.length > 0 ? recommendedSongs : [
+                                { id: 1, title: "Drift", artist: "Soft Beats", coverUrl: "/img/song1.jpg" },
+                                { id: 2, title: "Golden Hour", artist: "Dreamfield", coverUrl: "/img/song2.jpg" },
+                                { id: 3, title: "Echoes", artist: "Cloud Club", coverUrl: "/img/song3.jpg" },
+                            ]).map((song) => (
+                                <div key={song.id} className="playlist-song">
+                                <div className="song-info">
+                                    <img src={song.coverUrl} alt={song.title} />
+                                    <div className="song-text">
+                                    <p className="song-title">{song.title}</p>
+                                    <p className="song-artist">{song.artist}</p>
+                                    </div>
                                 </div>
+                                <CirclePlus onClick={() => handleAddSong(song)} />
+                                </div>
+                            ))}
                             </div>
-                            <CirclePlus onClick={() => handleAddSong(song)} />
-                            </div>
-                        ))}
                         </div>
-                    </div>
                     )}
 
             </div>
