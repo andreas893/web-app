@@ -1,59 +1,92 @@
+// src/App.jsx
 import { Routes, Route } from "react-router-dom";
+
+// ⭐ Core / feed / landing
 import LandingPage from "./pages/LandingPage";
+
+// ⭐ Auth / onboarding
+import OnboardingPage from "./pages/OnboardingPage";
+import Opret from "./components/Opret";       // signup
+import Login from "./components/Login";
+
+// ⭐ Content creation / sharing
 import ShareSong from "./components/ShareSong";
 import SharePlaylist from "./pages/SharePlaylist";
-import Login from "./components/Login";
-import ProtectedRoute from "./components/ProtectedRoute";
-import OnboardingPage from "./pages/OnboardingPage";
-import LibraryPage from "./pages/LibraryPage";
-import Opret from "./components/Opret";
-import PlaylistView from "./pages/PlaylistView";
 import MoodPage from "./pages/MoodPage";
+
+// ⭐ Wrapped / insights
 import WrappedWeek from "./pages/WrappedWeek";
 import WrappedMonth from "./pages/WrappedMonth";
+import StatisticsPage from "./pages/StatisticsPage";
+
+// ⭐ Library / profile
+import LibraryPage from "./pages/LibraryPage";
 import ProfilePage from "./pages/ProfilePage";
 import PinnedPage from "./pages/PinnedPage";
-import StatisticsPage from "./pages/StatisticsPage";
+import PlaylistView from "./pages/PlaylistView";
+
+// ⭐ Social (nyttt)
+import MessagesPage from "./pages/MessagesPage";
+import ChatPage from "./pages/ChatPage";
+import NotificationsPage from "./pages/NotificationsPage";
+
+// ⭐ Protected example
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-black text-white font-inter">
       <Routes>
-        {/* Onboarding og Signup */}
+
+        {/* ─────────────────────────────
+           Onboarding / Auth
+        ───────────────────────────── */}
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path="/signup" element={<Opret />} />
-
-        {/* Startside */}
-        <Route path="/" element={<LandingPage />} />
-
-        {/* Dele en sang */}
-        <Route path="/share-song" element={<ShareSong />} />
-
-        {/* Dele en playliste */}
-        <Route path="/share-playlist" element={<SharePlaylist />} />
-
-        {/* Login (til senere) */}
         <Route path="/login" element={<Login />} />
 
-        {/* Library side */}
-        <Route path="/library" element={<LibraryPage />} />
+        {/* ─────────────────────────────
+           Hovedapp / Feed
+        ───────────────────────────── */}
+        <Route path="/" element={<LandingPage />} />
 
+        {/* ─────────────────────────────
+           Deling / Opret indhold
+        ───────────────────────────── */}
+        <Route path="/share-song" element={<ShareSong />} />
+        <Route path="/share-playlist" element={<SharePlaylist />} />
+        <Route path="/choose-mood" element={<MoodPage />} />
+
+        {/* ─────────────────────────────
+           Bibliotek / Profil / Playlist
+        ───────────────────────────── */}
+        <Route path="/library" element={<LibraryPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/pinned" element={<PinnedPage />} />
-        <Route path="/stats" element={<StatisticsPage />} />
-
         <Route path="/playlist/:id" element={<PlaylistView />} />
-        <Route path="/choose-mood" element={<MoodPage />} />
-        {/* Wrapped sider */}
+
+        {/* ─────────────────────────────
+           Wrapped / Statistik
+        ───────────────────────────── */}
         <Route path="/wrapped-week" element={<WrappedWeek />} />
         <Route path="/wrapped-month" element={<WrappedMonth />} />
+        <Route path="/stats" element={<StatisticsPage />} />
 
-        {/* Beskyttet testside */}
+        {/* ─────────────────────────────
+           Social / Beskeder / Notifikationer
+        ───────────────────────────── */}
+        <Route path="/messages" element={<MessagesPage />} />
+        <Route path="/messages/:chatId" element={<ChatPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+
+        {/* ─────────────────────────────
+           Beskyttet route eksempel
+        ───────────────────────────── */}
         <Route
           path="/protected"
           element={
             <ProtectedRoute>
-              <h1>Kun for loggede brugere</h1>
+              <h1 className="p-4 text-white">Kun for loggede brugere</h1>
             </ProtectedRoute>
           }
         />
