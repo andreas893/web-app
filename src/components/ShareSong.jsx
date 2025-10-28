@@ -5,8 +5,20 @@ import { loginWithSpotify, getSpotifyToken } from "../spotifyAuthPKCE";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 
-export default function ShareSong() {
-  const [token, setToken] = useState(() => localStorage.getItem("spotify_access_token"));
+/**
+ * Props fra ChatPage:
+ * - inChatMode: true/false
+ * - onSelectTrack(trackId): callback når man vælger en sang (kun i chat)
+ * - onClose(): luk popup (kun i chat)
+ */
+export default function ShareSong({
+  inChatMode = false,
+  onSelectTrack,
+  onClose,
+}) {
+  const [token, setToken] = useState(() =>
+    localStorage.getItem("spotify_access_token")
+  );
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [selectedSong, setSelectedSong] = useState(null);
@@ -14,7 +26,7 @@ export default function ShareSong() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // 🔐 Når Spotify sender os tilbage med ?code=...
+  // efter Spotify redirect med ?code=...
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
@@ -23,19 +35,21 @@ export default function ShareSong() {
       getSpotifyToken(code)
         .then((newToken) => {
           if (newToken) {
-            // gem token lokalt
             localStorage.setItem("spotify_access_token", newToken);
             setToken(newToken);
 
-            // fjern ?code=... fra URL'en og sørg for vi står på /share-song (din route)
-            window.history.replaceState({}, document.title, "/share-song");
+            // hvis vi var på en route (ikke popup), fjern query params
+            if (!inChatMode) {
+              window.history.replaceState({}, document.title, "/share-song");
+            }
           }
         })
         .catch((err) => console.error("Token fejl:", err));
     }
-  }, [token]);
+  }, [token, inChatMode]);
 
-  // 🎧 Hvis ingen token -> start Spotify login flow
+  // hvis vi ikke HAR token → prøv loginWithSpotify
+  // nu også i chat-mode, for så kan vi faktisk søge i popup'en
   useEffect(() => {
     if (!token) {
       console.log("Ingen Spotify-token fundet — starter login...");
@@ -43,38 +57,46 @@ export default function ShareSong() {
     }
   }, [token]);
 
-  // 🎵 Søg tracks i Spotify
-  const handleSearch = async () => {
+  async function handleSearch() {
     if (!query.trim()) return;
+    if (!token) {
+      console.warn("Ingen token endnu, kan ikke søge.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const res = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`,
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+          query
+        )}&type=track&limit=10`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // token udløbet eller ugyldig
+      // token kan være udløbet
       if (res.status === 401) {
-        console.warn("Token udløbet — logger ind igen...");
+        console.warn("Token udløbet — prøver login igen...");
         localStorage.removeItem("spotify_access_token");
         loginWithSpotify();
         return;
       }
 
       const data = await res.json();
-      setResults(data.tracks?.items || []);
+
+      const list = data.tracks?.items || [];
+      setResults(list);
     } catch (err) {
       console.error("Spotify søgefejl:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  // 💾 Post til Firestore
-  const handleShare = async () => {
+  // public del til feed
+  async function handleSharePublic() {
     if (!selectedSong) {
       alert("Vælg en sang først!");
       return;
@@ -91,60 +113,115 @@ export default function ShareSong() {
         timestamp: serverTimestamp(),
       });
 
-      // ryd UI
       setQuery("");
       setComment("");
       setResults([]);
       setSelectedSong(null);
 
       alert("🎉 Sangen er delt!");
-      navigate("/"); // efter del -> hjem, kan ændres hvis du vil
+      navigate("/");
     } catch (err) {
       console.error("Fejl ved deling:", err);
     }
-  };
+  }
+
+  // privat del til chat
+  function chooseForChat(song) {
+    if (onSelectTrack) {
+      onSelectTrack(song.id); // giver trackId tilbage til ChatPage
+    }
+  }
 
   return (
-    <div className="relative min-h-screen bg-black text-white flex flex-col items-center p-6">
-      {/* Luk / gå tilbage */}
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute top-5 right-5 text-gray-300 hover:text-white transition"
+    <div
+      className={
+        inChatMode
+          ? "text-white flex flex-col p-4"
+          : "relative min-h-screen bg-black text-white flex flex-col items-center p-6"
+      }
+    >
+      {/* Header */}
+      {inChatMode ? (
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-base font-semibold">Del sang i chat</h1>
+          {onClose && (
+            <button
+              className="text-gray-300 hover:text-white text-sm"
+              onClick={onClose}
+            >
+              Luk
+            </button>
+          )}
+        </div>
+      ) : (
+        <>
+          <button
+            onClick={() => navigate(-1)}
+            className="absolute top-5 right-5 text-gray-300 hover:text-white transition"
+          >
+            <X size={28} />
+          </button>
+
+          <h1 className="text-2xl font-bold mb-2 mt-14">Del sang</h1>
+          <p className="text-gray-400 mb-6 text-center">
+            Søg efter en sang, du vil dele med dit netværk.
+          </p>
+        </>
+      )}
+
+      {/* Søg input + knap */}
+      <div
+        className={
+          inChatMode
+            ? "w-full mb-3"
+            : "w-full max-w-md flex flex-col items-center mb-3"
+        }
       >
-        <X size={28} />
-      </button>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Søg efter en sang..."
+          className={
+            inChatMode
+              ? "w-full bg-[#1E1E1E] rounded-xl p-3 text-white outline-none text-sm"
+              : "w-full max-w-md bg-[#1E1E1E] rounded-xl p-3 text-white outline-none mb-3"
+          }
+        />
 
-      {/* Titel */}
-      <h1 className="text-2xl font-bold mb-2 mt-14">Del sang</h1>
-      <p className="text-gray-400 mb-6 text-center">
-        Søg efter en sang, du vil dele med dit netværk.
-      </p>
-
-      {/* Søg */}
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Søg efter en sang..."
-        className="w-full max-w-md bg-[#1E1E1E] rounded-xl p-3 mb-3 text-white outline-none"
-      />
-
-      <button
-        onClick={handleSearch}
-        disabled={loading}
-        className="bg-[#4D00FF] px-5 py-2 rounded-xl text-white font-semibold w-full max-w-md disabled:opacity-60"
-      >
-        {loading ? "Søger..." : "Søg"}
-      </button>
+        <button
+          onClick={handleSearch}
+          disabled={loading}
+          className={
+            inChatMode
+              ? "bg-[#4D00FF] px-4 py-2 rounded-xl text-white font-semibold text-sm disabled:opacity-60 mt-2"
+              : "bg-[#4D00FF] px-5 py-2 rounded-xl text-white font-semibold w-full max-w-md disabled:opacity-60"
+          }
+        >
+          {loading ? "Søger..." : "Søg"}
+        </button>
+      </div>
 
       {/* Resultater */}
-      <div className="mt-6 w-full max-w-md space-y-3">
+      <div
+        className={
+          inChatMode
+            ? "flex-1 overflow-y-auto space-y-3"
+            : "mt-6 w-full max-w-md space-y-3"
+        }
+      >
         {results.map((song) => (
           <div
             key={song.id}
-            onClick={() => setSelectedSong(song)}
+            onClick={() => {
+              if (inChatMode) {
+                chooseForChat(song);
+              } else {
+                setSelectedSong(song);
+              }
+            }}
             className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition ${
-              selectedSong?.id === song.id
+              !inChatMode && selectedSong?.id === song.id
                 ? "bg-[#4D00FF]"
                 : "bg-[#1E1E1E] hover:bg-[#2A2A2A]"
             }`}
@@ -155,8 +232,8 @@ export default function ShareSong() {
               className="w-14 h-14 rounded-lg object-cover"
             />
             <div>
-              <p className="font-semibold">{song.name}</p>
-              <p className="text-sm text-gray-400">
+              <p className="font-semibold text-sm">{song.name}</p>
+              <p className="text-xs text-gray-400">
                 {song.artists.map((a) => a.name).join(", ")}
               </p>
             </div>
@@ -164,18 +241,18 @@ export default function ShareSong() {
         ))}
       </div>
 
-      {/* Kommentar + Del */}
-      {selectedSong && (
+      {/* feed-mode footer */}
+      {!inChatMode && selectedSong && (
         <div className="mt-6 w-full max-w-md">
           <textarea
             placeholder="Skriv kommentar..."
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="w-full bg-[#1E1E1E] rounded-xl p-3 text-white outline-none h-24 resize-none"
+            className="w-full bg-[#1E1E1E] rounded-xl p-3 text-white outline-none h-24 resize-none text-sm"
           />
 
           <button
-            onClick={handleShare}
+            onClick={handleSharePublic}
             className="w-full mt-3 bg-[#4D00FF] py-3 rounded-xl font-semibold"
           >
             Del
