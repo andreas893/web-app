@@ -24,6 +24,7 @@ import LibraryPage from "./pages/LibraryPage";
 import ProfilePage from "./pages/ProfilePage";
 import PinnedPage from "./pages/PinnedPage";
 import PlaylistView from "./pages/PlaylistView";
+import BadgePage from "./pages/BadgePage"
 
 // ⭐ Social (nyttt)
 import MessagesPage from "./pages/MessagesPage";
@@ -64,6 +65,7 @@ export default function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/pinned" element={<PinnedPage />} />
         <Route path="/playlist/:id" element={<PlaylistView />} />
+        <Route path="/badges" element={<BadgePage />} />
 
         {/* ─────────────────────────────
            Wrapped / Statistik
