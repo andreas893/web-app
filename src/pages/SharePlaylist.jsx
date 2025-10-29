@@ -63,7 +63,7 @@ export default function SharePlaylist() {
 
       <button
         className="bg-[#4D00FF] w-full mt-4 py-3 rounded-2xl font-semibold"
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
       >
         Del
       </button>

@@ -119,7 +119,7 @@ export default function ShareSong({
       setSelectedSong(null);
 
       alert("🎉 Sangen er delt!");
-      navigate("/");
+      navigate("/home");
     } catch (err) {
       console.error("Fejl ved deling:", err);
     }

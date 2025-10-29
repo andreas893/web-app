@@ -33,12 +33,15 @@ import NotificationsPage from "./pages/NotificationsPage";
 
 // ⭐ Protected example
 import ProtectedRoute from "./components/ProtectedRoute";
+import { Navigate } from "react-router-dom";
 
 export default function App() {
   return (
     <main className="min-h-screen bg-black text-white font-inter">
       <Routes>
 
+        {/* Default entry: altid login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         {/* ─────────────────────────────
            Onboarding / Auth
         ───────────────────────────── */}
@@ -49,9 +52,15 @@ export default function App() {
         {/* ─────────────────────────────
            Hovedapp / Feed
         ───────────────────────────── */}
-        <Route path="/" element={<LandingPage />} />
-
-        {/* ─────────────────────────────
+          <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+             <LandingPage />
+            </ProtectedRoute>
+          }
+        />
+          {/* ─────────────────────────────
            Deling / Opret indhold
         ───────────────────────────── */}
         <Route path="/share-song" element={<ShareSong />} />
@@ -80,18 +89,6 @@ export default function App() {
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/messages/:chatId" element={<ChatPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
-
-        {/* ─────────────────────────────
-           Beskyttet route eksempel
-        ───────────────────────────── */}
-        <Route
-          path="/protected"
-          element={
-            <ProtectedRoute>
-              <h1 className="p-4 text-white">Kun for loggede brugere</h1>
-            </ProtectedRoute>
-          }
-        />
       </Routes>
     </main>
   );
