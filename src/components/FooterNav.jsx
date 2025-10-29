@@ -9,7 +9,7 @@ export default function FooterNav() {
   const [showSharePopup, setShowSharePopup] = useState(false);
 
   const icons = [
-    { icon: Home, path: "/" },
+    { icon: Home, path: "/home" },
     { icon: Library, path: "/library" },
     { icon: Plus, path: "share" }, // denne håndteres manuelt
     { icon: MessageCircle, path: "/messages" },

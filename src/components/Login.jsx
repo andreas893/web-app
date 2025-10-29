@@ -60,7 +60,7 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, emailToUse, password);
 
       console.log("✅ Login succesfuldt!");
-      navigate("/"); // fx til forsiden
+      navigate("/home"); // fx til forsiden
     } catch (err) {
       console.error(err);
       setError("Forkert brugernavn/e-mail eller adgangskode.");
@@ -73,7 +73,7 @@ export default function Login() {
     try {
       await signInWithPopup(auth, provider)
       console.log("logget ind med google");
-      navigate("/");      
+      navigate("/home");      
     } catch (error) {
       console.error("Google-login fejl", error.message);
       setError("Noget gik galt med Facebook-login.");
@@ -85,7 +85,7 @@ export default function Login() {
     try {
       await signInWithPopup(auth, provider);
       console.log("✅ Logget ind med Facebook");
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       console.error("Facebook-login fejl:", error.message);
       setError("Noget gik galt med Facebook-login.");

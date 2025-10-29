@@ -79,7 +79,7 @@ export default function WrappedMonth() {
       <button
         onClick={(e) => {
           e.stopPropagation();
-          navigate("/");
+          navigate("/home");
         }}
         className="absolute top-5 right-5 text-white/90 hover:text-white transition"
       >
