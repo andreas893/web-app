@@ -5,6 +5,7 @@ import { doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimest
 import { db, auth } from "../firebase";
 import { fetchSpotifyRecommendations } from "../spotifyApi";
 
+
 import { ArrowLeft, User, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp, } from "lucide-react";
 import "../playlistView.css";
 import FooterNav from "../components/FooterNav";
@@ -12,14 +13,14 @@ import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
 
  // spotify recommended fetch, map moods til spotify-genrer
     const moodToGenre = {
-        Glad: "pop",
+        Glad: "happy",
         Trist: "sad",
         Chill: "chill",
         Energisk: "dance",
-        Kreativ: "indie",
+        Kreativ: "indie-pop",
         Forelsket: "romance",
         Fokuseret: "study",
-        Vred: "metal",
+        Vred: "metalcore",
         };
 
 export default function PlaylistView() {

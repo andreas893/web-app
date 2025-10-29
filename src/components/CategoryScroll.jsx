@@ -54,7 +54,7 @@ export default function BadgeCategories() {
   ];
 
   return (
-    // 🟣 ScrollStack håndterer nu animationen – du behøver ikke gsap her
+    // ScrollStack håndterer nu animationen 
     <ScrollStack
       useWindowScroll
       baseScale={0.85}
