@@ -112,12 +112,23 @@ export default function ProfilePage() {
         <div className="profile-page">
             
             <div className="profile-header">
-                <div className="profile-pic">
-                    {userData?.photoURL ? (
-                        <img src={userData.photoURL} alt="Profilbillede" className="profile-img" />
-                    ) : (
-                        <User className="default-icon" strokeWidth={1} />
-                    )}
+               <div className="profile-pic">    
+                {/* fallback-ikon hvis der ikke er noget billede, eller det fejler */}
+                    <span className="default-avatar">
+                         {userData?.photoURL ? (
+                        <img
+                        src={userData.photoURL}
+                        alt="Profilbillede"
+                        className="profile-img"
+                        onError={(e) => {
+                            // fallback hvis billedet fejler at loade
+                            e.currentTarget.style.display = "none";
+                            e.currentTarget.nextSibling.style.display = "flex";
+                        }}
+                        />
+                    ) : null}
+                        <User className="default-icon" strokeWidth={1.5} />
+                    </span>
 
                     {isOwnProfile && (
                         <>

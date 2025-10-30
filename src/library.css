@@ -357,9 +357,13 @@ body {
 
 .confirm-overlay {
   display: flex;
+  position: absolute;
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(1px);
+  inset: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
   z-index: 200;
 }
 
@@ -369,7 +373,6 @@ body {
   padding: 2rem 1.5rem;
   text-align: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  max-width: 340px;
   width: 90%;
   animation: fadeIn 0.25s ease;
 }
