@@ -56,7 +56,7 @@ export default function ShareSong({
       loginWithSpotify();
     }
   }, [token]);
-
+  
   async function handleSearch() {
     if (!query.trim()) return;
     if (!token) {

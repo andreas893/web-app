@@ -37,7 +37,7 @@ import { Navigate } from "react-router-dom";
 
 export default function App() {
   return (
-    <main className="min-h-screen bg-black text-white font-inter">
+    <main className="min-h-screen">
       <Routes>
 
         {/* Default entry: altid login */}

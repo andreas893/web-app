@@ -5,12 +5,16 @@ import react from "@vitejs/plugin-react-swc";
 export default defineConfig(({ command }) => {
   const config = {
     plugins: [react()],
-    base: "/"
+    base: "/",
+    server: {
+      host: true,     // 👈 tillad adgang udefra (viser din lokale IP)
+      port: 5173,     // 👈 vælg den port Spotify-redirecten peger på
+    },
   };
 
   // Change base path when building for production
   if (command !== "serve") {
-    config.base = "web-app"; // 👈 Replace with your GitHub repository name
+    config.base = "/web-app"; // 👈 Replace with your GitHub repository name
   }
 
   return config;

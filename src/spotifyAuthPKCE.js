@@ -63,7 +63,8 @@ export async function getSpotifyToken(code) {
   });
 
   const data = await res.json();
-  console.log("🔐 Spotify token response:", data);
+ console.log("🔐 Spotify token response:", data);
+
 
   if (data.access_token) {
     console.log("✅ Token hentet korrekt!");
@@ -72,4 +73,5 @@ export async function getSpotifyToken(code) {
     console.error("❌ Spotify token fejl:", data);
     return null;
   }
+  
 }
