@@ -10,6 +10,8 @@
   --font-size-med:1.4rem;
   --font-size-h2:1.6rem;
   --font-size-h1:2.2rem;
+  --font-text: font-family: "gotham-book", sans-serif;
+  --font-heading: font-family: "gotham", sans-serif;
 }
 
 html, body, #root {
@@ -17,10 +19,17 @@ html, body, #root {
 }
 
 body {
-  @apply text-gray-100;
   color: var(--text-color);
   background: var(--bg);
-  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: "gotham", sans-serif;
+}
+
+body h1, h2, h3{
+  font-family: var(--font-heading);
+}
+
+body p, a, input, button {
+  font-family: var(--font-text);
 }
 
 /* Skjul horizontale scrollbars på iOS/Chrome */
