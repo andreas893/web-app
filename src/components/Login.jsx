@@ -3,8 +3,43 @@ import { useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup, FacebookAuthProvider, signInWithEmailAndPassword } from "firebase/auth";
 import { loginWithSpotify, getSpotifyToken } from "../spotifyAuthPKCE";
 import { auth, db } from "../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, setDoc, getDoc } from "firebase/firestore";
 import "../login.css";
+
+async function ensureUserDocument(user) {
+  if (!user) return;
+
+  const userRef = doc(db, "users", user.uid);
+  const snap = await getDoc(userRef);
+
+  if (!snap.exists()) {
+    await setDoc(userRef, {
+      userId: user.uid,
+      username: user.displayName || user.email?.split("@")[0] || "Ukendt bruger",
+      photoURL: user.photoURL || "/img/default-avatar.png",
+      email: user.email || "",
+      createdAt: new Date().toISOString(),
+      playlists: [],
+      pinned: [],
+    });
+    console.log("✅ Nyt user-dokument oprettet:", user.uid);
+  } else {
+    const data = snap.data();
+    const updates = {};
+
+    // Tilføj manglende felter til ældre brugere
+    if (!data.userId) updates.userId = user.uid;
+    if (!data.photoURL) updates.photoURL = "/img/default-avatar.png";
+    if (!data.username)
+      updates.username = user.displayName || user.email?.split("@")[0];
+
+    if (Object.keys(updates).length > 0) {
+      await setDoc(userRef, updates, { merge: true });
+      console.log("🔁 Opdaterede manglende felter for bruger:", user.uid);
+    }
+  }
+}
+
 
 export default function Login() {
   const [identifier, setIdentifier] = useState(""); // kan være e-mail eller brugernavn
@@ -39,58 +74,69 @@ export default function Login() {
 
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      let emailToUse = identifier;
+  e.preventDefault();
+  try {
+    let emailToUse = identifier;
 
-      // 1️⃣ Hvis brugeren har skrevet et brugernavn i stedet for e-mail:
-      if (!identifier.includes("@")) {
-        const q = query(collection(db, "users"), where("username", "==", identifier));
-        const querySnapshot = await getDocs(q);
+    // 1️⃣ Hvis brugeren har skrevet et brugernavn i stedet for e-mail:
+    if (!identifier.includes("@")) {
+      const q = query(collection(db, "users"), where("username", "==", identifier));
+      const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.empty) {
-          throw new Error("Brugernavn ikke fundet");
-        }
-
-        const userDoc = querySnapshot.docs[0];
-        emailToUse = userDoc.data().email; // brug den tilhørende e-mail
+      if (querySnapshot.empty) {
+        throw new Error("Brugernavn ikke fundet");
       }
 
-      // 2️⃣ Login med Firebase Auth
-      await signInWithEmailAndPassword(auth, emailToUse, password);
-
-      console.log("✅ Login succesfuldt!");
-      navigate("/home"); // fx til forsiden
-    } catch (err) {
-      console.error(err);
-      setError("Forkert brugernavn/e-mail eller adgangskode.");
+      const userDoc = querySnapshot.docs[0];
+      emailToUse = userDoc.data().email;
     }
-  };
+
+    // 2️⃣ Login med Firebase Auth
+    await signInWithEmailAndPassword(auth, emailToUse, password);
+
+    // ✅ Sørg for at user-dokumentet eksisterer og har userId
+    await ensureUserDocument(auth.currentUser);
+
+    console.log("✅ Login succesfuldt!");
+    navigate("/home");
+  } catch (err) {
+    console.error(err);
+    setError("Forkert brugernavn/e-mail eller adgangskode.");
+  }
+};
 
 
-  const handleGoogleLogin = async () =>{
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider)
-      console.log("logget ind med google");
-      navigate("/home");      
-    } catch (error) {
-      console.error("Google-login fejl", error.message);
-      setError("Noget gik galt med Facebook-login.");
-    }
-  };
+  const handleGoogleLogin = async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithPopup(auth, provider);
 
-  const handleFacebookLogin = async () => {
-    const provider = new FacebookAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      console.log("✅ Logget ind med Facebook");
-      navigate("/home");
-    } catch (error) {
-      console.error("Facebook-login fejl:", error.message);
-      setError("Noget gik galt med Facebook-login.");
-    }
-  };
+    // ✅ Opret / opdater Firestore-dokument
+    await ensureUserDocument(auth.currentUser);
+
+    console.log("✅ Logget ind med Google");
+    navigate("/home");
+  } catch (error) {
+    console.error("Google-login fejl:", error.message);
+    setError("Noget gik galt med Google-login.");
+  }
+};
+
+ const handleFacebookLogin = async () => {
+  const provider = new FacebookAuthProvider();
+  try {
+    await signInWithPopup(auth, provider);
+
+    // ✅ Opret / opdater Firestore-dokument
+    await ensureUserDocument(auth.currentUser);
+
+    console.log("✅ Logget ind med Facebook");
+    navigate("/home");
+  } catch (error) {
+    console.error("Facebook-login fejl:", error.message);
+    setError("Noget gik galt med Facebook-login.");
+  }
+};
 
   // Start PKCE-flow med jeres helper (bruger VITE_SPOTIFY_REDIRECT_URI)
   const handleSpotifyLogin = () => {

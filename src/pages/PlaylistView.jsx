@@ -327,7 +327,28 @@ export default function PlaylistView() {
                    
                     <h1 className="playlist-name">{playlist.name || playlist.song}</h1>
                     <h2 className="mood">{playlist.mood || ""}</h2>
-                    <p> <span className="user"><User /></span> {playlist.user || "Ukendt bruger"}s playliste</p>
+                    <p className="user-line">
+                        {playlist.userPhoto ? (
+                            <img
+                            src={playlist.userPhoto}
+                            alt={playlist.user || "Ukendt bruger"}
+                            className="user-avatar"
+                            onError={(e) => {
+                                // fallback hvis billedet ikke findes eller fejler
+                                e.currentTarget.style.display = "none";
+                                e.currentTarget.nextSibling.style.display = "flex";
+                            }}
+                            />
+                        ) : null}
+
+                        <span className="user-fallback">
+                            <User size={20} color="#aaa" />
+                        </span>
+
+                        <span className="user-name">
+                            {playlist.userName || "Ukendt bruger"}s playliste
+                        </span>
+                    </p>
                 </div>
             </div>
 
@@ -367,12 +388,12 @@ export default function PlaylistView() {
                                 <p className="song-artist">{song.artist}</p>
                             </div>
                             </div>
-                            <EllipsisVertical className="options" onClick={(e) => {
+                            <div><EllipsisVertical className="options" onClick={(e) => {
                                 e.stopPropagation();
                                 setPopupType("options")
                                 setPopupContext("song")
                                 setSelectedSong(song);
-                            }}/>
+                            }}/></div>
                         </div>
                     ))}
 

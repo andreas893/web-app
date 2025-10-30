@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Music, Sparkles, Users, Pin, Share2, Trash2, PinOff, AlertTriangle, Plus } from "lucide-react";
-import { updateDoc, doc, arrayUnion, arrayRemove, getDoc, deleteDoc, addDoc, serverTimestamp, collection } from "firebase/firestore";
+import { updateDoc, doc, arrayUnion, getDoc, deleteDoc, addDoc, serverTimestamp, collection } from "firebase/firestore";
 import { db, auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import DetailsPopup from "../components/DetailsPopup"
 import { useNavigate } from "react-router";
 
@@ -15,6 +16,8 @@ export default function CreatePlaylistPopup({ type = "create", onClose, playlist
   const [createType, setCreateType] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [currentUser, setCurrentUser] = useState(null);
+
 
   const dummyFriends = [
   { id: "1", name: "Andreas", avatar: "/img/andreas.jpg" },
@@ -25,6 +28,26 @@ export default function CreatePlaylistPopup({ type = "create", onClose, playlist
 console.log("Origin:", location.state);
 console.log("🎧 Playlist objekt i popup:", playlist);
 
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    setCurrentUser(user);
+  });
+  return () => unsubscribe();
+}, []);
+
+
+// ✅ Helper til at hente brugerinfo sikkert (så vi slipper for at gentage os)
+const getUserInfo = () => {
+  if (!currentUser) return null;
+  return {
+    userId: currentUser.uid,
+    userName:
+      currentUser.displayName ||
+      currentUser.email?.split("@")[0] ||
+      "Ukendt bruger",
+    userPhoto: currentUser.photoURL || "/img/default-avatar.png",
+  };
+};
   // tjek om playliste/sang er pinned
   useEffect(() => {
   const checkPinned = async () => {
@@ -43,15 +66,16 @@ console.log("🎧 Playlist objekt i popup:", playlist);
 }, [playlist]);
 
   // Luk ved klik udenfor
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (popupRef.current && !popupRef.current.contains(e.target)) {
-        onClose();
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose]);
+ useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (showConfirm) return; // 🚫 Deaktivér når confirm vises
+    if (popupRef.current && !popupRef.current.contains(e.target)) {
+      onClose();
+    }
+  };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [onClose, showConfirm]);
 
   // Gemmer pinned i databasen
   const togglePin = async () => {
@@ -94,19 +118,14 @@ console.log("🎧 Playlist objekt i popup:", playlist);
             : "/img/fallback.jpg"; // fallback kun hvis begge er tomme
 
         // find korrekt brugernavn
-        const resolvedUser =
-          playlist.user ||
-          playlist.userName ||
-          playlist.createdBy ||
-          user.displayName ||
-          user.email?.split("@")[0] ||
-          "Ukendt bruger";
+       const resolvedUser = getUserInfo();
+
 
         const pinnedData = {
           id: playlist.id,
           name: playlist.name || playlist.songName || "Ukendt titel",
           imgUrl: resolvedImg,
-          user: resolvedUser,
+          ...resolvedUser,
           source: context || "playlist",
           timestamp: new Date().toISOString(),
         };
@@ -122,36 +141,6 @@ console.log("🎧 Playlist objekt i popup:", playlist);
         console.error("Fejl ved toggle pin:", err);
       }
   };
-
-
-
-
-  // Delete funktion
-const handleDelete = async () => {
-  const user = auth.currentUser;
-  if (!user || !playlist) return;
-
-  if (playlist.userId !== user.uid) {
-    alert("Du kan kun slette dine egne playlister.");
-    return;
-  }
-
-  try {
-    await deleteDoc(doc(db, "playlists", playlist.id));
-
-    const userRef = doc(db, "users", user.uid);
-    await updateDoc(userRef, {
-      playlists: arrayRemove(playlist.id),
-      pinned: arrayRemove(playlist.id),
-    });
-
-    console.log("🗑️ Playlist slettet:", playlist.name);
-    setShowConfirm(false);
-    onClose();
-  } catch (err) {
-    console.error("Fejl ved sletning:", err);
-  }
-};
 
   // Toggle til del/venneliste
   const toggleFriend = (friendId) => {
@@ -194,35 +183,56 @@ const handleShare = async () => {
 };
 
 
-  async function handleCreatePlaylist({ name, cover }, type) {
-  const user = auth.currentUser;
-  if (!user) return alert("Du skal være logget ind for at oprette en playliste!");
+ async function handleCreatePlaylist({ name, cover }, type) {
+  const info = getUserInfo();
+  if (!info) {
+    alert("Du skal være logget ind for at oprette en playliste!");
+    return;
+  }
 
+  const { userId, userName, userPhoto } = info;
+
+  // 🔹 Definér standardcover
+  const DEFAULT_COVER = "/img/default-cover.png"; // Sørg for at dette findes i /public/img/
+
+  // 🔹 Brug uploaded billede hvis muligt, ellers fallback
+  const finalCover =
+    typeof cover === "string" && cover.trim() !== "" ? cover : DEFAULT_COVER;
+
+  // 🔹 Opret nyt playlist-objekt
   const newPlaylist = {
-    userId: user.uid,
-    user: user.displayName || user.email.split("@")[0],
+    userId,
+    userName,
+    userPhoto,
     name: name?.trim(),
-    imgUrl: cover || "/img/fallback.jpg",
+    imgUrl: finalCover,
     type,
     songs: [],
     timestamp: serverTimestamp(),
   };
 
+  // 💾 Gem i Firestore 'playlists' collection
   const docRef = await addDoc(collection(db, "playlists"), newPlaylist);
 
-   const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        playlists: arrayUnion({
-          id: docRef.id,
-          name: newPlaylist.name,
-          user: newPlaylist.user,
-          imgUrl: newPlaylist.imgUrl,
-          type: newPlaylist.type,
-        }),
-    });
+  // 🔗 Opdater brugerens profil med den nye playliste
+  const userRef = doc(db, "users", userId);
+  await updateDoc(userRef, {
+    playlists: arrayUnion({
+      id: docRef.id,
+      name: newPlaylist.name,
+      userId,
+      userName,
+      userPhoto,
+      imgUrl: finalCover,
+      type: newPlaylist.type,
+    }),
+  });
 
+  console.log("✅ Ny playliste oprettet:", newPlaylist);
   navigate(`/playlist/${docRef.id}`, { state: { origin: "created" } });
 }
+
+
 
  function handleCreateClick(type) {
   if (type === "/choose-mood") {
@@ -233,6 +243,68 @@ const handleShare = async () => {
     setShowDetails(true);
   }
 }
+
+// delete funktion
+const handleDelete = async () => {
+  const info = getUserInfo();
+  if (!info || !playlist) {
+    alert("Fejl – ingen bruger eller playliste fundet.");
+    return;
+  }
+
+  const { userId } = info;
+
+  try {
+    console.log("🗑️ Forsøger at slette:", playlist);
+
+    // 1️⃣ Find dokumentet i global 'playlists'
+    const playlistRef = doc(db, "playlists", playlist.id);
+    const snap = await getDoc(playlistRef);
+
+    if (!snap.exists()) {
+      alert("Playlist ikke fundet i databasen.");
+      return;
+    }
+
+    const data = snap.data();
+    if (data.userId !== userId) {
+      alert("Du kan kun slette dine egne playlister.");
+      return;
+    }
+
+    
+    // 2️⃣ Slet fra 'playlists' collection
+    console.log("🔍 Sletter dokument med ID:", playlist.id);
+    await deleteDoc(playlistRef);
+    console.log("✅ Slettet fra global playlists:", playlist.id);
+
+    // 3️⃣ Fjern fra brugerens document (pinned + playlists)
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      const updatedPlaylists = (userData.playlists || []).filter(
+        (p) => p.id !== playlist.id
+      );
+      const updatedPinned = (userData.pinned || []).filter(
+        (p) => p.id !== playlist.id
+      );
+
+      await updateDoc(userRef, {
+        playlists: updatedPlaylists,
+        pinned: updatedPinned,
+      });
+      console.log("🧹 Fjernet fra brugerprofil:", playlist.id);
+    }
+
+    alert(`🗑️ '${playlist.name}' er slettet.`);
+    setShowConfirm(false);
+    onClose();
+  } catch (err) {
+    console.error("❌ Fejl ved sletning:", err);
+    alert("Noget gik galt under sletning. Se konsollen for detaljer.");
+  }
+};
 
 
   return (
@@ -254,7 +326,7 @@ const handleShare = async () => {
       <div className="popup-icon"><Music size={25} /></div>
       <div className="popup-text">
         <h3>Playliste</h3>
-        <p>Opret en playliste med sange du selv tilføjer</p>
+        <p>Opret din helt egen playliste</p>
       </div>
     </button>
 
@@ -263,7 +335,7 @@ const handleShare = async () => {
       <div className="popup-icon"><Users size={25} /></div>
       <div className="popup-text">
         <h3>Fælles playliste</h3>
-        <p>Opret en playliste sammen med dine venner</p>
+        <p>Opret en playliste med dine venner</p>
       </div>
     </button>
   </>
@@ -384,8 +456,8 @@ const handleShare = async () => {
 
        {/* Bekræft slet-popup */}
       {showConfirm && (
-        <div className="popup-overlay confirm-overlay">
-          <div className="confirm-popup">
+        <div className="confirm-overlay" onClick={(e) => e.stopPropagation()}>
+          <div className="confirm-popup" onClick={(e) => e.stopPropagation()}>
             <AlertTriangle size={42} color="#ff4d4d" />
             <h3>Er du sikker på, at du vil slette?</h3>
             <p>{playlist?.name}</p>

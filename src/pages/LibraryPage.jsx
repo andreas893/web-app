@@ -2,6 +2,7 @@ import FooterNav from "../components/FooterNav"
 import { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { doc, onSnapshot } from "firebase/firestore";
+
 import { useNavigate } from "react-router-dom";
 import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
 import { LayoutGrid, List, EllipsisVertical } from "lucide-react"
@@ -73,13 +74,21 @@ export default function LibraryPage() {
     setActiveTab((prev) => (prev === tabName ? null : tabName));
   };
 
-    const combinedData = [...playlists, ...savedPlaylists.map((s) => ({
+    const user = auth.currentUser;
+   const combinedData = [
+  ...playlists.map((p) => ({
+    ...p,
+    isMine: p.userId === user?.uid || p.createdBy === user?.displayName || false,
+  })),
+  ...savedPlaylists.map((s) => ({
     id: s.id,
     name: s.name || "Ukendt titel",
-    createdBy: s.user || "Ukendt bruger",
-    isMine: false,
+    userId: s.userId,
+    createdBy: s.userName || s.user || "Ukendt bruger",
     imgUrl: s.imgUrl || s.coverUrl || "https://via.placeholder.com/150",
-  }))];
+    isMine: s.userId === user?.uid, // tjek ejerskab for gemte
+  })),
+];
 
 
  const filteredPlaylists =
@@ -132,7 +141,7 @@ export default function LibraryPage() {
          <div className={`playlist-list ${viewMode}`}>
         {filteredPlaylists.map((playlist) => (
           <div key={playlist.id} className="library-playlist-card" onClick={() => navigate(`/playlist/${playlist.id}`, { state: { origin: "library" } })}>
-            <img src={playlist.imgUrl} alt={playlist.name} className="cover" />
+            <img  src={playlist.imgUrl || "/images/default-cover.png"} alt={playlist.name} onError={(e) => (e.currentTarget.src = "/images/default-cover.png")} className="cover" />
             
             <div className="info">
               <h3>{playlist.name}</h3>

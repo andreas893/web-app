@@ -20,7 +20,7 @@ export default function SharePopup({ onClose }) {
           onDragEnd={(e, info) => {
             if (info.offset.y > 100) onClose();
           }}
-          className="bg-[#1E1E1E] w-full rounded-t-3xl p-6 text-white relative"
+          className="bg-[#23262C] w-full h-[35vh] rounded-t-3xl p-6 text-white relative shadow-[0_-6px_20px_rgba(0,0,0,0.6)]"
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
@@ -35,38 +35,40 @@ export default function SharePopup({ onClose }) {
 
           {/* Valg */}
           <div className="space-y-3">
+            {/* === DEL PLAYLIST === */}
             <div
-              className="flex items-center gap-4 p-4 bg-[#2A2A2A] rounded-2xl cursor-pointer hover:bg-[#333333] transition"
+              className="flex items-center gap-4 pb-2 pt-4 rounded-2xl cursor-pointer hover:bg-[#333333] transition"
               onClick={() => {
                 onClose();
                 navigate("/share-playlist");
               }}
             >
-              <div className="bg-white text-[#1E1E1E] p-3 rounded-full">
-                <ListMusic size={22} />
+              <div className="popup-icon">
+                <ListMusic size={28} />
               </div>
               <div>
                 <p className="font-semibold text-white">Del Playlist</p>
                 <p className="text-sm text-gray-400">
-                  Del en playliste til dit netværk, for dem at se og gemme
+                  Del en playliste til dit netværk.
                 </p>
               </div>
             </div>
 
+            {/* === DEL SANG === */}
             <div
-              className="flex items-center gap-4 p-4 bg-[#2A2A2A] rounded-2xl cursor-pointer hover:bg-[#333333] transition"
+              className="flex items-center gap-4 rounded-2xl cursor-pointer hover:bg-[#333333] transition"
               onClick={() => {
                 onClose();
                 navigate("/share-song");
               }}
             >
-              <div className="bg-white text-[#1E1E1E] p-3 rounded-full">
-                <Music size={22} />
+              <div className="popup-icon">
+                <Music size={28} />
               </div>
               <div>
                 <p className="font-semibold text-white">Del sang</p>
                 <p className="text-sm text-gray-400">
-                  Del en sang til dit netværk, for dem at se og gemme
+                  Del en sang til dit netværk.
                 </p>
               </div>
             </div>
