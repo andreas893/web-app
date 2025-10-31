@@ -1,7 +1,8 @@
+// src/components/Feed.jsx
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { User, Heart, MessageSquare, Bookmark, X, Trash2 } from "lucide-react";
-import { db, auth} from "../firebase";
+import { db, auth } from "../firebase";
 import {
   collection,
   addDoc,
@@ -13,9 +14,9 @@ import {
   doc,
   setDoc,
   getDocs,
-  arrayUnion, 
+  arrayUnion,
   arrayRemove,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
 
 export default function Feed() {
@@ -115,6 +116,17 @@ export default function Feed() {
       timestamp: serverTimestamp(),
     });
 
+    // 🔔 Tilføj notifikation
+    await addDoc(collection(db, "notifications"), {
+      type: "comment",
+      postId: activePost.id,
+      postOwnerId: activePost.userId,
+      user: user.displayName || user.email.split("@")[0],
+      userId: user.uid,
+      imageUrl: activePost.imgUrl,
+      createdAt: serverTimestamp(),
+    });
+
     setNewComment("");
     document.activeElement?.blur();
   };
@@ -133,12 +145,13 @@ export default function Feed() {
     await deleteDoc(doc(db, "comments", comment.id));
   };
 
-  // ❤️ Like opslag
+  // ❤️ Like opslag + notifikation
   const toggleLike = async (post) => {
     const user = auth.currentUser;
     if (!user) return alert("Log ind for at like!");
     const postId = post.id.toString();
     const docRef = doc(db, "likes", `${user.uid}_${postId}`);
+
     if (liked[postId]) {
       await deleteDoc(docRef);
     } else {
@@ -147,51 +160,73 @@ export default function Feed() {
         userId: user.uid,
         timestamp: serverTimestamp(),
       });
+
+      // 🔔 Tilføj notifikation til Firestore
+      await addDoc(collection(db, "notifications"), {
+        type: "like",
+        postId,
+        postOwnerId: post.userId,
+        user: user.displayName || user.email.split("@")[0],
+        userId: user.uid,
+        imageUrl: post.imgUrl,
+        createdAt: serverTimestamp(),
+      });
     }
+
     setLiked((prev) => ({ ...prev, [postId]: !prev[postId] }));
   };
 
-  // 🔖 Gem opslag
+  // 🔖 Gem opslag + notifikation
   const toggleSave = async (post) => {
     const user = auth.currentUser;
     if (!user) return alert("Log ind for at gemme!");
     const postId = post.id.toString();
     const docRef = doc(db, "saves", `${user.uid}_${postId}`);
     const userRef = doc(db, "users", user.uid);
-    
-   
-  if (saved[postId]) {
-    // ❌ Fjern fra saves og fra brugerens playlists
-    await deleteDoc(docRef);
-    await updateDoc(userRef, {
-      playlists: arrayRemove({
-        id: post.id,
-        song: post.song,
-        user: post.user,
-        imgUrl: post.imgUrl,
-      }),
-    });
-  } else {
-    // ✅ Gem i saves + tilføj til brugerens playlists
-    await setDoc(docRef, {
-      postId,
-      userId: user.uid,
-      timestamp: serverTimestamp(),
-    });
 
-    await updateDoc(userRef, {
-      playlists: arrayUnion({
-        id: post.id,
-        name: post.name,
-        song: post.song,
-        user: post.user,
-        imgUrl: post.imgUrl,
-      }),
-    });
-  }
+    if (saved[postId]) {
+      // ❌ Fjern fra saves
+      await deleteDoc(docRef);
+      await updateDoc(userRef, {
+        playlists: arrayRemove({
+          id: post.id,
+          song: post.song,
+          user: post.user,
+          imgUrl: post.imgUrl,
+        }),
+      });
+    } else {
+      // ✅ Gem opslag
+      await setDoc(docRef, {
+        postId,
+        userId: user.uid,
+        timestamp: serverTimestamp(),
+      });
 
-  setSaved((prev) => ({ ...prev, [postId]: !prev[postId] }));
-};
+      await updateDoc(userRef, {
+        playlists: arrayUnion({
+          id: post.id,
+          name: post.name,
+          song: post.song,
+          user: post.user,
+          imgUrl: post.imgUrl,
+        }),
+      });
+
+      // 🔔 Tilføj notifikation
+      await addDoc(collection(db, "notifications"), {
+        type: "save",
+        postId,
+        postOwnerId: post.userId,
+        user: user.displayName || user.email.split("@")[0],
+        userId: user.uid,
+        imageUrl: post.imgUrl,
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    setSaved((prev) => ({ ...prev, [postId]: !prev[postId] }));
+  };
 
   // 🗑️ Hold for delete
   const startHold = (postId) => {
@@ -224,18 +259,27 @@ export default function Feed() {
     setProgress(0);
     setDeleting(null);
   };
+
   return (
     <section className="mt-8">
       <h2 className="text-lg font-bold mb-3">Feed</h2>
 
       <div className="flex gap-4 overflow-x-auto hide-scroll">
         {feed.map((postRaw) => {
-          // 💡 Normaliser felter (nye + gamle)
-         const post = {
+          const post = {
             id: postRaw.id,
-            imgUrl: postRaw.imgUrl || postRaw.image || "/images/default-cover.png",
-            song: postRaw.song || postRaw.songName || postRaw.playlistName || "Ukendt sang",
-            userName: postRaw.username || postRaw.userName || postRaw.user || "Ukendt bruger",
+            imgUrl:
+              postRaw.imgUrl || postRaw.image || "/images/default-cover.png",
+            song:
+              postRaw.song ||
+              postRaw.songName ||
+              postRaw.playlistName ||
+              "Ukendt sang",
+            userName:
+              postRaw.username ||
+              postRaw.userName ||
+              postRaw.user ||
+              "Ukendt bruger",
             userPhoto: postRaw.userPhoto || "/images/default-avatar.png",
             name: postRaw.name || postRaw.playlistName || "Ukendt titel",
             userId: postRaw.userId,
@@ -245,11 +289,12 @@ export default function Feed() {
             <div
               key={post.id}
               className="flex-shrink-0 w-[220px] bg-[#1E1E1E] rounded-[18px] overflow-hidden cursor-pointer relative"
-             onClick={() =>
+              onClick={() =>
                 navigate(`/playlist/${post.id}`, {
                   state: { origin: "feed" },
-                })}>
-
+                })
+              }
+            >
               <div className="relative">
                 {post.imgUrl ? (
                   <img
@@ -285,10 +330,10 @@ export default function Feed() {
                   />
                   <MessageSquare
                     className="w-7 h-7 text-white cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation(); // forhindrer at kortets onClick trigges
-                        setActivePost({ ...postRaw, ...post }); // åbner popup med kommentarer
-                      }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActivePost({ ...postRaw, ...post });
+                    }}
                   />
                   <Bookmark
                     fill={saved[post.id] ? "gold" : "none"}
@@ -301,7 +346,7 @@ export default function Feed() {
                     }}
                   />
 
-                  {/* 🗑️ Hold for delete (kun ejeren) */}
+                  {/* 🗑️ Hold for delete */}
                   {auth.currentUser?.uid === postRaw.userId && (
                     <div
                       onMouseDown={() => startHold(post.id)}
@@ -342,7 +387,7 @@ export default function Feed() {
         })}
       </div>
 
-      {/* 🪟 Fullscreen post visning */}
+      {/* 🪟 Kommentar popup */}
       {activePost && (
         <div className="fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50 p-4 overflow-y-auto">
           <button
@@ -364,12 +409,12 @@ export default function Feed() {
           <div className="w-full max-w-[400px] bg-[#1E1E1E] rounded-2xl p-4">
             <h3 className="font-semibold mb-3">Kommentarer</h3>
 
-            {/* Kommentarer */}
             <div className="space-y-3 mb-3">
               {comments.map((c) => (
                 <div key={c.id} className="flex justify-between items-center">
                   <p className="text-sm">
-                    <span className="font-semibold">{c.userName}</span>: {c.text}
+                    <span className="font-semibold">{c.userName}</span>:{" "}
+                    {c.text}
                   </p>
                   {(auth.currentUser?.uid === c.userId ||
                     auth.currentUser?.uid === c.postOwnerId) && (

@@ -1,3 +1,4 @@
+// src/components/ShareSong.jsx
 import { useEffect, useState } from "react";
 import { db, auth } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
@@ -38,7 +39,6 @@ export default function ShareSong({
             localStorage.setItem("spotify_access_token", newToken);
             setToken(newToken);
 
-            // hvis vi var på en route (ikke popup), fjern query params
             if (!inChatMode) {
               window.history.replaceState({}, document.title, "/share-song");
             }
@@ -49,14 +49,13 @@ export default function ShareSong({
   }, [token, inChatMode]);
 
   // hvis vi ikke HAR token → prøv loginWithSpotify
-  // nu også i chat-mode, for så kan vi faktisk søge i popup'en
   useEffect(() => {
     if (!token) {
       console.log("Ingen Spotify-token fundet — starter login...");
       loginWithSpotify();
     }
   }, [token]);
-  
+
   async function handleSearch() {
     if (!query.trim()) return;
     if (!token) {
@@ -65,7 +64,6 @@ export default function ShareSong({
     }
 
     setLoading(true);
-
     try {
       const res = await fetch(
         `https://api.spotify.com/v1/search?q=${encodeURIComponent(
@@ -76,7 +74,6 @@ export default function ShareSong({
         }
       );
 
-      // token kan være udløbet
       if (res.status === 401) {
         console.warn("Token udløbet — prøver login igen...");
         localStorage.removeItem("spotify_access_token");
@@ -85,7 +82,6 @@ export default function ShareSong({
       }
 
       const data = await res.json();
-
       const list = data.tracks?.items || [];
       setResults(list);
     } catch (err) {
@@ -96,47 +92,42 @@ export default function ShareSong({
   }
 
   // public del til feed
- async function handleSharePublic() {
-  if (!selectedSong) {
-    alert("Vælg en sang først!");
-    return;
+  async function handleSharePublic() {
+    if (!selectedSong) {
+      alert("Vælg en sang først!");
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Du skal være logget ind for at dele en sang!");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "posts"), {
+        type: "song",
+        userId: user.uid,
+        username: user.displayName || user.email.split("@")[0],
+        userPhoto: user.photoURL || "/images/default-avatar.png",
+        name: selectedSong.name,
+        artist: selectedSong.artists.map((a) => a.name).join(", "),
+        imgUrl: selectedSong.album.images[0]?.url || "/images/default-cover.png",
+        comment: comment.trim(),
+        timestamp: serverTimestamp(),
+      });
+
+      // ✅ Gå til confirmation-side i stedet for alert
+      navigate("/song-shared");
+    } catch (err) {
+      console.error("Fejl ved deling:", err);
+    }
   }
-
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Du skal være logget ind for at dele en sang!");
-    return;
-  }
-
-  try {
-    await addDoc(collection(db, "posts"), {
-      type: "song", // 🆕 vigtigt for at skelne fra playlists
-      userId: user.uid,
-      username: user.displayName || user.email.split("@")[0],
-      userPhoto: user.photoURL || "/images/default-avatar.png",
-      name: selectedSong.name,
-      artist: selectedSong.artists.map((a) => a.name).join(", "),
-      imgUrl: selectedSong.album.images[0]?.url || "/images/default-cover.png",
-      comment: comment.trim(),
-      timestamp: serverTimestamp(),
-    });
-
-    setQuery("");
-    setComment("");
-    setResults([]);
-    setSelectedSong(null);
-
-    alert("🎉 Sangen er delt!");
-    navigate("/home");
-  } catch (err) {
-    console.error("Fejl ved deling:", err);
-  }
-}
 
   // privat del til chat
   function chooseForChat(song) {
     if (onSelectTrack) {
-      onSelectTrack(song.id); // giver trackId tilbage til ChatPage
+      onSelectTrack(song.id);
     }
   }
 
@@ -177,7 +168,7 @@ export default function ShareSong({
         </>
       )}
 
-      {/* Søg input + knap */}
+      {/* Søg input */}
       <div
         className={
           inChatMode
@@ -196,7 +187,6 @@ export default function ShareSong({
               : "w-full max-w-md bg-[#1E1E1E] rounded-xl p-3 text-white outline-none mb-3"
           }
         />
-
         <button
           onClick={handleSearch}
           disabled={loading}
@@ -222,11 +212,8 @@ export default function ShareSong({
           <div
             key={song.id}
             onClick={() => {
-              if (inChatMode) {
-                chooseForChat(song);
-              } else {
-                setSelectedSong(song);
-              }
+              if (inChatMode) chooseForChat(song);
+              else setSelectedSong(song);
             }}
             className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition ${
               !inChatMode && selectedSong?.id === song.id
