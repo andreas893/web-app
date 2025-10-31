@@ -5,6 +5,11 @@ import { loginWithSpotify, getSpotifyToken } from "../spotifyAuthPKCE";
 import { auth, db } from "../firebase";
 import { collection, query, where, getDocs, doc, setDoc, getDoc } from "firebase/firestore";
 import "../login.css";
+import { FaSpotify } from "react-icons/fa";
+import { AiFillGoogleCircle } from "react-icons/ai";
+import { FaFacebook } from "react-icons/fa";
+
+
 
 async function ensureUserDocument(user) {
   if (!user) return;
@@ -156,17 +161,16 @@ export default function Login() {
       {/* socials login */}
       <div className="social-login">
           <button onClick={handleSpotifyLogin} className="social-btn spotify">
-            <img src="/images/spotify.png" alt="spotify-logo" />
+            <FaSpotify size={30} />
             <p>Fortsæt med Spotify</p></button>
-
           <button onClick={handleGoogleLogin} className="social-btn google">
-          <img src="/images/google.png" alt="google-logo" />
+          <AiFillGoogleCircle size={30} />
           <p>
           Fortsæt med Google
           </p></button>
 
           <button onClick={handleFacebookLogin} className="social-btn facebook">
-            <img src="/images/facebook-01.png" alt="facebook-logo" />
+            <FaFacebook size={30}/>
             <p>Fortsæt med Facebook</p></button>
       </div>
   

@@ -19,15 +19,32 @@ const Opret = () => {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            await setDoc(doc(db, "users", user.uid),{
-                email: user.email,
-                username: username.toLocaleLowerCase(),
-                createdAt: new Date(),
-                moods: [],
-                genres: [],
-                playlists: [],
+           await setDoc(doc(db, "users", user.uid), {
+          // Basale brugerdata
+          userId: user.uid,
+          email: user.email,
+          username: username.trim().toLowerCase(),
+          photoURL: "/images/default-avatar.png", // fallback
+          createdAt: new Date(),
 
-            });
+          // Social struktur
+          followers: [],
+          following: [],
+
+          // Musikpræferencer
+          moods: [],              // fx ["Glad", "Chill"]
+          genres: [],             // fx ["Pop", "Jazz"]
+          discoveryPreference: null,
+          eraPreference: null,          
+
+          // Indhold og interaktioner
+          playlists: [],           // gemte eller oprettede
+          pinned: [],              // pinned playlister/posts
+          posts: [],               // (kan evt. tilføjes når du vil have feed-relateret data)
+
+          // Notifikationer
+          notifications: [],       // valgfrit — eller du bruger separat collection
+        });
         
          console.log("Bruger oprettet ✅"); 
          navigate("/onboarding", { replace: true });
@@ -42,6 +59,7 @@ const Opret = () => {
 
   return (
      <div className="opret-page">
+      <div className="opret-img"><img src="/images/chord-logo.png" alt="chord-logo" /></div>
       <h2>Opret konto</h2>
       <form onSubmit={handleSignup}>
          <input
