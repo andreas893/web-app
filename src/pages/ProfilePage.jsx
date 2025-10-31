@@ -118,128 +118,124 @@ export default function ProfilePage() {
 
     
 
-    return(
-        <div className="profile-page">
-            
-            <div className="profile-header">
-               <div className="profile-pic">    
-                {/* fallback-ikon hvis der ikke er noget billede, eller det fejler */}
-                    <span className="default-avatar">
-                         {userData?.photoURL ? (
-                        <img
-                        src={userData.photoURL}
-                        alt="Profilbillede"
-                        className="profile-img"
-                        onError={(e) => {
-                            // fallback hvis billedet fejler at loade
-                            e.currentTarget.style.display = "none";
-                            e.currentTarget.nextSibling.style.display = "flex";
-                        }}
-                        />
-                    ) : null}
-                        <User className="default-icon" strokeWidth={1.5} />
-                    </span>
+     return (
+    <div className="profile-page">
+      <div className="profile-header">
+        <div className="profile-pic">
+          <span className="default-avatar">
+            {userData?.photoURL ? (
+              <img
+                src={userData.photoURL}
+                alt="Profilbillede"
+                className="profile-img"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  e.currentTarget.nextSibling.style.display = "flex";
+                }}
+              />
+            ) : null}
+            <User className="default-icon" strokeWidth={1.5} />
+          </span>
 
-                    {isOwnProfile && (
-                        <>
-                        <label htmlFor="profile-upload" className="edit-icon">
-                            <Pencil className="pencil" size={18} />
-                        </label>
-                        <input
-                            type="file"
-                            id="profile-upload"
-                            accept="image/*"
-                            style={{ display: "none" }}
-                            onChange={handleProfileImageChange}
-                        />
-                        </>
-                    )}
-                </div>
-
-                <div className="profile-meta">
-                    <div className="username"><h2>{userData?.username || userData?.user || "Ukendt bruger"}</h2></div>
-
-                    <div className="followers">
-                        <p>Følger: {userData?.following?.length || 0}</p>
-                        <p>Følgere: {userData?.followers?.length || 0}</p>
-
-                        {/* Følg-knap kun hvis det ikke er din profil */}
-                        {!isOwnProfile && (
-                            <button
-                            className={`follow-btn ${
-                                userData?.followers?.includes(auth.currentUser?.uid)
-                                ? "following"
-                                : ""
-                            }`}
-                            onClick={() => toggleFollow(profileUserId)}
-                            >
-                            {userData?.followers?.includes(auth.currentUser?.uid)
-                                ? "Følger"
-                                : "Følg"}
-                            </button>
-                        )}
-                    </div>
-                </div>
-
-                {isOwnProfile && (
-                    <div className="options" onClick={() => setShowOptions(true)}>
-                    <EllipsisVertical />
-                    </div>
-                )}
-            </div>
-
-
-            <div className="pinned">
-                <div className="pinned-heading">
-                    <h2>Pinned</h2>
-                    <ArrowRight onClick={() => navigate("/pinned")} />
-                </div>
-
-               <div className="pinned-elements">
-                    {!userData?.pinned?.length ? (
-                        <p>Ingen pinned endnu</p>) : (
-                        userData.pinned.map((item) => (
-                        <div key={item.id} className="pinned-card">
-                            <img src={item.imgUrl} alt={item.name} />
-                            <p>{item.name}</p>
-                        </div>
-                        ))
-                    )}
-                </div>
-            </div>
-
-            {/* Kun på din egen profil */}
-            {isOwnProfile && (
-                <>
-                    <StatsSection />
-
-                    <div className="badges-section">
-                        <div className="badges-heading">
-                            <h2>Badges og Achievements</h2>
-                            <ArrowRight onClick={() => navigate("/badges")}/>
-                        </div>
-
-                        <div className="badges-grid">
-                            {badges.map((b) => (
-                            <BadgeCard key={b.title} {...b} />
-                            ))}
-                        </div>
-                    </div>
-                </>
-            )}
-
-
-
-            {showOptions && (
-                <ProfileOptionsPopup
-                    onClose={() => setShowOptions(false)}
-                    onEdit={() => {
-                    setShowOptions(false);
-                    }}
-                />
-            )}
-
-            <FooterNav />
+          {isOwnProfile && (
+            <>
+              <label htmlFor="profile-upload" className="edit-icon">
+                <Pencil className="pencil" size={18} />
+              </label>
+              <input
+                type="file"
+                id="profile-upload"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleProfileImageChange}
+              />
+            </>
+          )}
         </div>
-    );
+
+        <div className="profile-meta">
+          <div className="username">
+            <h2>{userData?.username || userData?.user || "Ukendt bruger"}</h2>
+          </div>
+
+          <div className="followers">
+            <p>Følger: {userData?.following?.length || 0}</p>
+            <p>Følgere: {userData?.followers?.length || 0}</p>
+
+            {!isOwnProfile && (
+              <button
+                className={`follow-btn ${
+                  userData?.followers?.includes(auth.currentUser?.uid)
+                    ? "following"
+                    : ""
+                }`}
+                onClick={() => toggleFollow(profileUserId)}
+              >
+                {userData?.followers?.includes(auth.currentUser?.uid)
+                  ? "Følger"
+                  : "Følg"}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {isOwnProfile && (
+          <div className="options" onClick={() => setShowOptions(true)}>
+            <EllipsisVertical />
+          </div>
+        )}
+      </div>
+
+      {/* 📌 Pinned */}
+      <div className="pinned">
+        <div className="pinned-heading">
+          <h2>Pinned</h2>
+          {isOwnProfile && (
+            <ArrowRight onClick={() => navigate("/pinned")} className="cursor-pointer" />
+          )}
+        </div>
+
+        <div className="pinned-elements">
+          {!userData?.pinned?.length ? (
+            <p>Ingen pinned endnu</p>
+          ) : (
+            userData.pinned.map((item) => (
+              <div key={item.id} className="pinned-card">
+                <img src={item.imgUrl} alt={item.name} />
+                <p>{item.name}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* 📊 Statistikker – kun for egen profil */}
+      {isOwnProfile && <StatsSection />}
+
+      {/* 🏅 Badges – vis for alle, men pil kun for egen profil */}
+      <div className="badges-section">
+        <div className="badges-heading">
+          <h2>Badges og Achievements</h2>
+          {isOwnProfile && (
+            <ArrowRight onClick={() => navigate("/badges")} className="cursor-pointer" />
+          )}
+        </div>
+
+        <div className="badges-grid">
+          {badges.map((b) => (
+            <BadgeCard key={b.title} {...b} />
+          ))}
+        </div>
+      </div>
+
+      {showOptions && (
+        <ProfileOptionsPopup
+          onClose={() => setShowOptions(false)}
+          onEdit={() => setShowOptions(false)}
+        />
+      )}
+
+      <FooterNav />
+    </div>
+  );
 };

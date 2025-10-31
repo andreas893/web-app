@@ -5,8 +5,11 @@ import FooterNav from "../components/FooterNav";
 
 export default function LandingPage() {
   return (
-    <div className="bg-[#121212] text-white min-h-screen flex flex-col font-inter relative">
+    <div className="bg-[#121212] min-h-screen flex flex-col font-inter relative">
       <main className="flex-1 pb-20 overflow-y-auto hide-scroll px-4">
+        <div className="logo-header">
+          <img src="/images/chord-logo.png" alt="Chord logo" />
+        </div>
         <SoundForYou />
         <Feed />
         <Wrapped />

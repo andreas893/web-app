@@ -107,7 +107,12 @@ body {
 
 .library-playlist-card .info h3 {
   margin: 0;
-  font-size: var(--font-size-med);
+  font-size:1.2rem;
+}
+
+.library-playlist-card .info p {
+  margin: 0;
+  font-size:0.8rem;
 }
 
 /* grid view */
