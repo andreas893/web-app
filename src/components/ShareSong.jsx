@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { loginWithSpotify, getSpotifyToken } from "../spotifyAuthPKCE";
 import { useNavigate } from "react-router-dom";
@@ -96,34 +96,42 @@ export default function ShareSong({
   }
 
   // public del til feed
-  async function handleSharePublic() {
-    if (!selectedSong) {
-      alert("Vælg en sang først!");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "posts"), {
-        userId: "testuser",
-        user: "Testbruger",
-        name: selectedSong.name,
-        artist: selectedSong.artists.map((a) => a.name).join(", "),
-        imgUrl: selectedSong.album.images[0]?.url || "",
-        comment: comment.trim(),
-        timestamp: serverTimestamp(),
-      });
-
-      setQuery("");
-      setComment("");
-      setResults([]);
-      setSelectedSong(null);
-
-      alert("🎉 Sangen er delt!");
-      navigate("/home");
-    } catch (err) {
-      console.error("Fejl ved deling:", err);
-    }
+ async function handleSharePublic() {
+  if (!selectedSong) {
+    alert("Vælg en sang først!");
+    return;
   }
+
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Du skal være logget ind for at dele en sang!");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "posts"), {
+      type: "song", // 🆕 vigtigt for at skelne fra playlists
+      userId: user.uid,
+      username: user.displayName || user.email.split("@")[0],
+      userPhoto: user.photoURL || "/images/default-avatar.png",
+      name: selectedSong.name,
+      artist: selectedSong.artists.map((a) => a.name).join(", "),
+      imgUrl: selectedSong.album.images[0]?.url || "/images/default-cover.png",
+      comment: comment.trim(),
+      timestamp: serverTimestamp(),
+    });
+
+    setQuery("");
+    setComment("");
+    setResults([]);
+    setSelectedSong(null);
+
+    alert("🎉 Sangen er delt!");
+    navigate("/home");
+  } catch (err) {
+    console.error("Fejl ved deling:", err);
+  }
+}
 
   // privat del til chat
   function chooseForChat(song) {

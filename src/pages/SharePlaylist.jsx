@@ -45,7 +45,7 @@ export default function SharePlaylist() {
         playlistName: playlist.name || "Ukendt navn",
         imgUrl: playlist.imgUrl || playlist.coverUrl || "",
         userId: user.uid,
-        username: user.displayName || "Ukendt bruger",
+        username: user.displayName || user.email.split("@")[0],
         comment: comment.trim(),
         timestamp: serverTimestamp(),
       });

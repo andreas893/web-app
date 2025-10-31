@@ -41,7 +41,7 @@ const getUserInfo = () => {
   if (!currentUser) return null;
   return {
     userId: currentUser.uid,
-    userName:
+    username:
       currentUser.displayName ||
       currentUser.email?.split("@")[0] ||
       "Ukendt bruger",
@@ -190,7 +190,7 @@ const handleShare = async () => {
     return;
   }
 
-  const { userId, userName, userPhoto } = info;
+  const { userId, username, userPhoto } = info;
 
   // 🔹 Definér standardcover
   const DEFAULT_COVER = "/img/default-cover.png"; // Sørg for at dette findes i /public/img/
@@ -202,7 +202,7 @@ const handleShare = async () => {
   // 🔹 Opret nyt playlist-objekt
   const newPlaylist = {
     userId,
-    userName,
+    username,
     userPhoto,
     name: name?.trim(),
     imgUrl: finalCover,
@@ -221,7 +221,7 @@ const handleShare = async () => {
       id: docRef.id,
       name: newPlaylist.name,
       userId,
-      userName,
+      username,
       userPhoto,
       imgUrl: finalCover,
       type: newPlaylist.type,

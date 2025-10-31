@@ -6,7 +6,7 @@ import { db, auth } from "../firebase";
 import { fetchSpotifyRecommendations } from "../spotifyApi";
 
 
-import { ArrowLeft, User, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp, } from "lucide-react";
+import { ArrowLeft, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp, } from "lucide-react";
 import "../playlistView.css";
 import FooterNav from "../components/FooterNav";
 import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
@@ -172,7 +172,7 @@ export default function PlaylistView() {
                 postId: id, // hvilken post kommentaren hører til
                 text: newComment,  // selve kommentarteksten
                 userId: user.uid,  // ID på brugeren der kommenterede
-                userName: user.displayName || user.email.split("@")[0], // brugernavn
+                username: user.displayName || user.email.split("@")[0], // brugernavn
                 userPhoto: user.photoURL || "/img/default-avatar.png", // profilbillede
                 postOwnerId: playlist.userId || "ukendt", // ejeren af playlisten (til evt. notifikationer)
                 likes: 0,  // antal likes
@@ -341,12 +341,8 @@ export default function PlaylistView() {
                             />
                         ) : null}
 
-                        <span className="user-fallback">
-                            <User size={20} color="#aaa" />
-                        </span>
-
                         <span className="user-name">
-                            {playlist.userName || "Ukendt bruger"}s playliste
+                        {playlist.username || "Ukendt bruger"}
                         </span>
                     </p>
                 </div>
@@ -443,13 +439,13 @@ export default function PlaylistView() {
                         <div key={c.id} className="comment">
                             <img
                             src={c.userPhoto || "/img/default-avatar.png"}
-                            alt={c.userName}
+                            alt={c.username}
                             className="comment-avatar"
                             />
 
                             <div className="comment-body">
                             <div className="comment-header">
-                                <span className="comment-user">{c.userName}</span>
+                                <span className="comment-user">{c.username}</span>
                                 <span className="comment-time">{timeSince(c.timestamp)}</span>
                             </div>
 
