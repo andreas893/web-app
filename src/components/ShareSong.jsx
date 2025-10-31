@@ -155,7 +155,7 @@ export default function ShareSong({
       ) : (
         <>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/home")}
             className="absolute top-5 right-5 text-gray-300 hover:text-white transition"
           >
             <X size={28} />

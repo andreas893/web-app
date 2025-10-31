@@ -148,8 +148,8 @@ export default function Login() {
      <div className="login-page">
       
       <div className="logo">
-         {/* <img src="" alt="" /> */}
-         <h2>Log på “app-navn”</h2>
+         <div className="logo-img"><img src="/images/chord-logo.png" alt="Chord logo" /></div>
+         <h2>Log ind på chord</h2>
       </div>
        
       
