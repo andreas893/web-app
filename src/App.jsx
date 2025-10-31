@@ -72,6 +72,7 @@ export default function App() {
         ───────────────────────────── */}
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/:id" element={<ProfilePage />} />
         <Route path="/pinned" element={<PinnedPage />} />
         <Route path="/playlist/:id" element={<PlaylistView />} />
         <Route path="/badges" element={<BadgePage />} />
