@@ -1,5 +1,5 @@
 // src/components/Feed.jsx
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { User, Heart, MessageSquare, Bookmark, X, Trash2 } from "lucide-react";
 import { db, auth } from "../firebase";
@@ -18,6 +18,7 @@ import {
   arrayRemove,
   updateDoc,
 } from "firebase/firestore";
+import DeleteConfirmPopup from "./DeleteConfirmPopup";
 
 export default function Feed() {
   const [feed, setFeed] = useState([]);
@@ -26,12 +27,9 @@ export default function Feed() {
   const [activePost, setActivePost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [deleting, setDeleting] = useState(null);
-  const [progress, setProgress] = useState(0);
+  const [confirmDelete, setConfirmDelete] = useState(null);
   const navigate = useNavigate();
 
-  const holdTimer = useRef(null);
-  const progressTimer = useRef(null);
 
   // 🔥 Hent opslag realtime
   useEffect(() => {
@@ -228,37 +226,52 @@ export default function Feed() {
     setSaved((prev) => ({ ...prev, [postId]: !prev[postId] }));
   };
 
-  // 🗑️ Hold for delete
-  const startHold = (postId) => {
-    setDeleting(postId);
-    setProgress(0);
-    let elapsed = 0;
+// 🗑️ Slet post med bekræftelse og oprydning
+const handleDeletePost = async (postId) => {
+  const user = auth.currentUser;
+  if (!user) return alert("Du skal være logget ind for at slette.");
+  
+  try {
+    const postRef = doc(db, "posts", postId);
+    const snap = await getDocs(query(collection(db, "posts"), where("__name__", "==", postId)));
 
-    progressTimer.current = setInterval(() => {
-      elapsed += 100;
-      setProgress((elapsed / 2000) * 100);
-    }, 100);
+    if (snap.empty) {
+      alert("Opslaget blev ikke fundet.");
+      return;
+    }
 
-    holdTimer.current = setTimeout(async () => {
-      try {
-        await deleteDoc(doc(db, "posts", postId));
-        alert("Opslag slettet ✅");
-      } catch (err) {
-        console.error("Fejl ved sletning:", err);
-      } finally {
-        clearInterval(progressTimer.current);
-        setProgress(0);
-        setDeleting(null);
-      }
-    }, 2000);
-  };
+    const postData = snap.docs[0].data();
+    if (postData.userId !== user.uid) {
+      alert("Du kan kun slette dine egne opslag.");
+      return;
+    }
 
-  const cancelHold = () => {
-    clearTimeout(holdTimer.current);
-    clearInterval(progressTimer.current);
-    setProgress(0);
-    setDeleting(null);
-  };
+    // 🧹 Slet selve posten
+    await deleteDoc(postRef);
+
+    // 🧹 Slet relaterede likes, kommentarer og saves
+    const likesSnap = await getDocs(query(collection(db, "likes"), where("postId", "==", postId)));
+    likesSnap.forEach(async (like) => await deleteDoc(doc(db, "likes", like.id)));
+
+    const commentsSnap = await getDocs(query(collection(db, "comments"), where("postId", "==", postId)));
+    commentsSnap.forEach(async (comment) => await deleteDoc(doc(db, "comments", comment.id)));
+
+    const savesSnap = await getDocs(query(collection(db, "saves"), where("postId", "==", postId)));
+    savesSnap.forEach(async (save) => await deleteDoc(doc(db, "saves", save.id)));
+
+    // 🧹 Fjern fra brugerens gemte playlister hvis nødvendigt
+    const userRef = doc(db, "users", user.uid);
+    await updateDoc(userRef, {
+      playlists: arrayRemove({ id: postId })
+    });
+
+    console.log("✅ Opslag slettet:", postId);
+  } catch (err) {
+    console.error("❌ Fejl ved sletning:", err);
+    alert("Noget gik galt under sletningen.");
+  }
+};
+
 
   return (
     <section className="mt-8">
@@ -348,30 +361,14 @@ export default function Feed() {
 
                   {/* 🗑️ Hold for delete */}
                   {auth.currentUser?.uid === postRaw.userId && (
-                    <div
-                      onMouseDown={() => startHold(post.id)}
-                      onMouseUp={cancelHold}
-                      onMouseLeave={cancelHold}
-                      className={`relative ${
-                        deleting === post.id ? "animate-pulse" : ""
-                      }`}
+                     <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConfirmDelete(post);
+                      }}
+                      className="relative"
                     >
-                      <Trash2
-                        className={`w-7 h-7 cursor-pointer transition ${
-                          deleting === post.id
-                            ? "text-red-500 scale-110"
-                            : "text-gray-400 hover:text-red-400"
-                        }`}
-                      />
-                      {deleting === post.id && (
-                        <div
-                          className="absolute bottom-0 left-0 h-[3px] bg-red-500 rounded-full"
-                          style={{
-                            width: `${progress}%`,
-                            transition: "width 0.1s linear",
-                          }}
-                        />
-                      )}
+                      <Trash2 className="w-7 h-7 text-gray-400 hover:text-red-500 cursor-pointer transition" />
                     </div>
                   )}
                 </div>
@@ -446,6 +443,17 @@ export default function Feed() {
             </div>
           </div>
         </div>
+      )}
+
+      {confirmDelete && (
+        <DeleteConfirmPopup
+          name={confirmDelete.name}
+          onCancel={() => setConfirmDelete(null)}
+          onConfirm={async () => {
+            await handleDeletePost(confirmDelete.id);
+            setConfirmDelete(null);
+          }}
+        />
       )}
     </section>
   );
