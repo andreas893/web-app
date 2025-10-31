@@ -38,28 +38,28 @@ export default function LibraryPage() {
     {
       id: "temp1",
       name: "Morning Vibes",
-      createdBy: "test5",
+      username: "test5",
       isMine: true,
       imgUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4",
     },
     {
       id: "temp2",
       name: "Chill Evenings",
-      createdBy: "mathias",
+      username: "mathias",
       isMine: false,
       imgUrl: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2",
     }, 
      {
       id: "temp3",
       name: "Chill Evenings",
-      createdBy: "mathias",
+      username: "mathias",
       isMine: false,
       imgUrl: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2",
     }, 
      {
       id: "temp4",
       name: "Chill Evenings",
-      createdBy: "mathias",
+      username: "mathias",
       isMine: false,
       imgUrl: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2",
     },
@@ -78,13 +78,13 @@ export default function LibraryPage() {
    const combinedData = [
   ...playlists.map((p) => ({
     ...p,
-    isMine: p.userId === user?.uid || p.createdBy === user?.displayName || false,
+    isMine: p.userId === user?.uid || p.username === user?.displayName || false,
   })),
   ...savedPlaylists.map((s) => ({
     id: s.id,
     name: s.name || "Ukendt titel",
     userId: s.userId,
-    createdBy: s.userName || s.user || "Ukendt bruger",
+    username: s.username || s.user || "Ukendt bruger",
     imgUrl: s.imgUrl || s.coverUrl || "https://via.placeholder.com/150",
     isMine: s.userId === user?.uid, // tjek ejerskab for gemte
   })),
@@ -145,7 +145,11 @@ export default function LibraryPage() {
             
             <div className="info">
               <h3>{playlist.name}</h3>
-              <p>Af {playlist.createdBy}</p>
+              <p>
+                  {playlist.type === "song"
+                  ? `Sang af ${playlist.username || "Ukendt bruger"}`
+                  : `Playliste af ${playlist.username || "Ukendt bruger"}`}
+              </p>
             </div>
 
             <button

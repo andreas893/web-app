@@ -111,7 +111,6 @@ export default function Feed() {
       text: newComment,
       userId: user.uid,
       userName: user.displayName || user.email.split("@")[0],
-      userPhoto:user.PhotoURL || <User />,
       postOwnerId: activePost.userId,
       timestamp: serverTimestamp(),
     });
@@ -232,13 +231,14 @@ export default function Feed() {
       <div className="flex gap-4 overflow-x-auto hide-scroll">
         {feed.map((postRaw) => {
           // 💡 Normaliser felter (nye + gamle)
-          const post = {
+         const post = {
             id: postRaw.id,
-            imgUrl: postRaw.imgUrl || postRaw.image || "/img/takecare.jpg",
-            song: postRaw.song || postRaw.songName || "Ukendt sang",
+            imgUrl: postRaw.imgUrl || postRaw.image || "/images/default-cover.png",
+            song: postRaw.song || postRaw.songName || postRaw.playlistName || "Ukendt sang",
+            userName: postRaw.username || postRaw.userName || postRaw.user || "Ukendt bruger",
+            userPhoto: postRaw.userPhoto || "/images/default-avatar.png",
+            name: postRaw.name || postRaw.playlistName || "Ukendt titel",
             userId: postRaw.userId,
-            userName: postRaw.userName || postRaw.user || "Ukendt bruger",
-            UserPhoto: postRaw.userPhoto || <User />,
           };
 
           return (
@@ -333,17 +333,9 @@ export default function Feed() {
               </div>
 
               {/* Tekst under billede */}
-             <div className="p-3 flex items-center gap-2">
-                  <img
-                    src={post.photoURL || "/images/default-avatar.png"}
-                    alt={post.userName}
-                    onError={(e) => (e.currentTarget.src = "/images/default-avatar.png")}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold">{post.name}</p>
-                    <p className="text-xs text-gray-400">{post.userName}</p>
-                  </div>
+              <div className="p-3">
+                <p className="text-sm font-semibold">{post.name}</p>
+                <p className="text-xs text-gray-400">{post.userName}</p>
               </div>
             </div>
           );
