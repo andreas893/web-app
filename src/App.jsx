@@ -1,18 +1,22 @@
 // src/App.jsx
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // ⭐ Core / feed / landing
 import LandingPage from "./pages/LandingPage";
 
 // ⭐ Auth / onboarding
 import OnboardingPage from "./pages/OnboardingPage";
-import Opret from "./components/Opret";       // signup
+import Opret from "./components/Opret";
 import Login from "./components/Login";
 
 // ⭐ Content creation / sharing
 import ShareSong from "./components/ShareSong";
 import SharePlaylist from "./pages/SharePlaylist";
 import MoodPage from "./pages/MoodPage";
+
+// ⭐ Confirmation sider
+import SongSharedConfirmation from "./components/SongSharedConfirmation";
+import PlaylistSharedConfirmation from "./components/PlaylistSharedConfirmation";
 
 // ⭐ Wrapped / insights
 import WrappedWeek from "./pages/WrappedWeek";
@@ -24,24 +28,23 @@ import LibraryPage from "./pages/LibraryPage";
 import ProfilePage from "./pages/ProfilePage";
 import PinnedPage from "./pages/PinnedPage";
 import PlaylistView from "./pages/PlaylistView";
-import BadgePage from "./pages/BadgePage"
+import BadgePage from "./pages/BadgePage";
 
-// ⭐ Social (nyttt)
+// ⭐ Social
 import MessagesPage from "./pages/MessagesPage";
 import ChatPage from "./pages/ChatPage";
 import NotificationsPage from "./pages/NotificationsPage";
 
 // ⭐ Protected example
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Navigate } from "react-router-dom";
 
 export default function App() {
   return (
     <main className="min-h-screen">
       <Routes>
-
-        {/* Default entry: altid login */}
+        {/* Default entry */}
         <Route path="/" element={<Navigate to="/login" replace />} />
+
         {/* ─────────────────────────────
            Onboarding / Auth
         ───────────────────────────── */}
@@ -52,20 +55,28 @@ export default function App() {
         {/* ─────────────────────────────
            Hovedapp / Feed
         ───────────────────────────── */}
-          <Route
+        <Route
           path="/home"
           element={
             <ProtectedRoute>
-             <LandingPage />
+              <LandingPage />
             </ProtectedRoute>
           }
         />
-          {/* ─────────────────────────────
+
+        {/* ─────────────────────────────
            Deling / Opret indhold
         ───────────────────────────── */}
         <Route path="/share-song" element={<ShareSong />} />
         <Route path="/share-playlist" element={<SharePlaylist />} />
         <Route path="/choose-mood" element={<MoodPage />} />
+
+        {/* ✅ Confirmation sider */}
+        <Route path="/song-shared" element={<SongSharedConfirmation />} />
+        <Route
+          path="/playlist-shared"
+          element={<PlaylistSharedConfirmation />}
+        />
 
         {/* ─────────────────────────────
            Bibliotek / Profil / Playlist
