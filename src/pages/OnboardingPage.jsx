@@ -29,7 +29,7 @@ export default function OnboardingPage() {
       {step === 3 && <StepMood onNext={nextStep} onPrev={prevStep} />}
       {step === 4 && <StepAge onNext={nextStep} onPrev={prevStep} />}
       {step === 5 && <StepDiscover onNext={nextStep} onPrev={prevStep} />}
-      {step === 6 && <StepSummary onNext={() => navigate("/mood-select")} />}
+      {step === 6 && <StepSummary onNext={() => navigate("/home")} />}
     </div>
   );
 }

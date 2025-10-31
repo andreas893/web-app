@@ -81,7 +81,7 @@ body {
   width: 100%;
 }
 
-.social-btn img{
+.social-btn svg{
    padding: 0 0.2rem;
    position: absolute;
    left: 20px;
@@ -154,6 +154,16 @@ body {
     padding: 1rem;
     align-items: center;
     font-size: 1.2rem;
+}
+
+.opret-img{
+    width: 200px;
+    height: 100px;
+    margin-bottom: 2rem;
+}
+
+.opret-img-img{
+    width: 60%;
 }
 
 .opret-page h2{

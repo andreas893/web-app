@@ -410,7 +410,7 @@ export default function PlaylistView() {
                             ]).map((song) => (
                                 <div key={song.id} className="playlist-song">
                                 <div className="song-info">
-                                    <img src={song.coverUrl} alt={song.title} />
+                                    <img src={song.imgUrl} alt={song.title} />
                                     <div className="song-text">
                                     <p className="song-title">{song.title}</p>
                                     <p className="song-artist">{song.artist}</p>
