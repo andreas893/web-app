@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import { Pencil, User, EllipsisVertical, ArrowRight} from 'lucide-react';
 import FooterNav from "../components/FooterNav";
 import StatsSection from "../components/StatsSection";
@@ -9,6 +10,7 @@ import BadgeCard from "../components/BadgeCard";
 import "../profile.css";
 import { useParams } from "react-router-dom";
 import ProfileOptionsPopup from "../components/ProfileOptions";
+
 
 export default function ProfilePage() {
 
@@ -30,19 +32,27 @@ export default function ProfilePage() {
 
 
     // Useeffect til at checke om det er brugerens egen profil eller en anden brugers profil
-    useEffect(() => {
-            if (!profileUserId) return;
+   useEffect(() => {
+  const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    const targetId = id || user?.uid;
+    if (!targetId) return;
 
-            const userRef = doc(db, "users", profileUserId);
-            const unsub = onSnapshot(userRef, (snap) => {
-            if (snap.exists()) {
-                setUserData(snap.data());
-            }
-            });
+    const userRef = doc(db, "users", targetId);
+    const unsubUser = onSnapshot(userRef, (snap) => {
+      if (snap.exists()) {
+        setUserData(snap.data());
+      } else {
+        console.warn("⚠️ Bruger ikke fundet i Firestore:", targetId);
+        setUserData(null);
+      }
+    });
 
-            return () => unsub();
-    }, [profileUserId]);
+    // cleanup for listener
+    return () => unsubUser();
+  });
 
+  return () => unsubscribeAuth();
+}, [id]);
 
 
     const toggleFollow = async (targetUserId) => {
