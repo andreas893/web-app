@@ -1,5 +1,3 @@
-// src/spotifyAuthPKCE.js
-
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const scopes = import.meta.env.VITE_SPOTIFY_SCOPES;
 const redirectUri = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
@@ -63,15 +61,17 @@ export async function getSpotifyToken(code) {
   });
 
   const data = await res.json();
- console.log("🔐 Spotify token response:", data);
-
+  console.log("🔐 Spotify token response:", data);
 
   if (data.access_token) {
     console.log("✅ Token hentet korrekt!");
+
+    // 🔥 Gem token i localStorage så spotifyService.js kan bruge den
+    localStorage.setItem("spotify_access_token", data.access_token);
+
     return data.access_token;
   } else {
     console.error("❌ Spotify token fejl:", data);
     return null;
   }
-  
 }
