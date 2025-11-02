@@ -1,4 +1,3 @@
-// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 
 // ⭐ Core / feed / landing
@@ -13,6 +12,7 @@ import Login from "./components/Login";
 import ShareSong from "./components/ShareSong";
 import SharePlaylist from "./pages/SharePlaylist";
 import MoodPage from "./pages/MoodPage";
+import MoodPlaylistPage from "./pages/MoodPlaylistPage"; // ✅ NY import
 
 // ⭐ Confirmation sider
 import SongSharedConfirmation from "./components/SongSharedConfirmation";
@@ -70,6 +70,7 @@ export default function App() {
         <Route path="/share-song" element={<ShareSong />} />
         <Route path="/share-playlist" element={<SharePlaylist />} />
         <Route path="/choose-mood" element={<MoodPage />} />
+        <Route path="/mood/:moodType" element={<MoodPlaylistPage />} /> {/* ✅ NY */}
 
         {/* ✅ Confirmation sider */}
         <Route path="/song-shared" element={<SongSharedConfirmation />} />
