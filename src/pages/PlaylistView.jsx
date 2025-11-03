@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRef } from "react";
 import { doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, increment, arrayUnion, arrayRemove, updateDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
-import { fetchSpotifyRecommendations } from "../spotifyApi";
+import { fetchSpotifyMoodRecommendations } from "../spotifyApi";
 
 
 import { ArrowLeft, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp, } from "lucide-react";
@@ -11,17 +11,6 @@ import "../playlistView.css";
 import FooterNav from "../components/FooterNav";
 import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
 
- // spotify recommended fetch, map moods til spotify-genrer
-    const moodToGenre = {
-        Glad: "happy",
-        Trist: "sad",
-        Chill: "chill",
-        Energisk: "dance",
-        Kreativ: "indie-pop",
-        Forelsket: "romance",
-        Fokuseret: "study",
-        Vred: "metalcore",
-        };
 
 export default function PlaylistView() {
     const { id } = useParams();
@@ -40,7 +29,7 @@ export default function PlaylistView() {
     const [popupContext, setPopupContext] = useState(null);
     const [selectedSong, setSelectedSong] = useState(null);
     const isOwnPlaylist = playlist?.userId === auth.currentUser?.uid;
-    const [recommendedSongs, setRecommendedSongs] = useState([]);
+    const [recommendedSongs, setRecommendedSongs] = useState(null);
 
    const origin = location.state?.origin || "unknown";
     const isFeedView = origin === "feed";
@@ -50,24 +39,24 @@ export default function PlaylistView() {
 
     const showRecommended = isLibraryView && !isFeedView && !isSharedView;
     
-    
-    const fetchRecommendedSongs = useCallback(async () => {
-    if (!playlist?.mood) return;
 
-    try {
-      const token = localStorage.getItem("spotify_access_token");
-      if (!token) {
-        console.warn("Ingen Spotify-token — springer anbefalinger over.");
-        return;
-      }
+   const fetchRecommendedSongs = useCallback(async () => {
+    console.log("🔄 fetchRecommendedSongs CALLED");
+  if (!playlist?.mood) return;
 
-      const genre = moodToGenre[playlist.mood] || "pop";
-      const recs = await fetchSpotifyRecommendations(token, genre);
-      setRecommendedSongs(recs);
-    } catch (err) {
-      console.error("Kunne ikke hente Spotify-sange:", err);
+  try {
+    const token = localStorage.getItem("spotify_access_token");
+    if (!token) {
+      console.warn("Ingen Spotify-token — springer anbefalinger over.");
+      return;
     }
-  }, [playlist?.mood]);
+
+    const recs = await fetchSpotifyMoodRecommendations(token, playlist.mood);
+    setRecommendedSongs(recs);
+  } catch (err) {
+    console.error("Kunne ikke hente Spotify-sange:", err);
+  }
+}, [playlist?.mood]);
 
   // useEffect der henter anbefalinger når playlist er hentet
   useEffect(() => {
@@ -395,33 +384,43 @@ export default function PlaylistView() {
 
                 </div>
 
-                    {showRecommended && (
+                   {showRecommended && (
                         <div className="recommended">
                             <div className="recommended-text">
                             <h3>Anbefalede sange</h3>
-                            <RefreshCcwIcon onClick={fetchRecommendedSongs} className="refresh-btn" />
+                            <button>
+                            <RefreshCcwIcon onClick={() => fetchRecommendedSongs()} className="refresh-btn" />
+                            </button>
                             </div>
 
                             <div className="playlist-content">
-                            {(recommendedSongs.length > 0 ? recommendedSongs : [
-                                { id: 1, title: "Drift", artist: "Soft Beats", coverUrl: "/img/song1.jpg" },
-                                { id: 2, title: "Golden Hour", artist: "Dreamfield", coverUrl: "/img/song2.jpg" },
-                                { id: 3, title: "Echoes", artist: "Cloud Club", coverUrl: "/img/song3.jpg" },
-                            ]).map((song) => (
+                            {recommendedSongs === null ? (
+                                <p className="loading">Henter anbefalinger...</p>
+                            ) : recommendedSongs.length === 0 ? (
+                                <p className="no-recommendations">Ingen anbefalinger fundet for dette mood 😕</p>
+                            ) : (
+                                recommendedSongs.map((song) => (
                                 <div key={song.id} className="playlist-song">
-                                <div className="song-info">
+                                    <div className="song-info">
                                     <img src={song.imgUrl} alt={song.title} />
                                     <div className="song-text">
-                                    <p className="song-title">{song.title}</p>
-                                    <p className="song-artist">{song.artist}</p>
+                                        <p className="song-title">{song.title}</p>
+                                        <p className="song-artist">{song.artist}</p>
                                     </div>
+                                    </div>
+
+                                    {/* ➕ Tilføj sang til playliste */}
+                                    <CirclePlus
+                                    onClick={() => handleAddSong(song)}
+                                    className="add-song-btn"
+                                    />
                                 </div>
-                                <CirclePlus onClick={() => handleAddSong(song)} />
-                                </div>
-                            ))}
+                                ))
+                            )}
                             </div>
                         </div>
-                    )}
+                        )}
+
 
             </div>
 

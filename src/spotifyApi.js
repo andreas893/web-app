@@ -19,27 +19,69 @@ export async function searchSpotifyTracks(query, token) {
     return data.tracks.items;
   }
 
-  export async function fetchSpotifyRecommendations(token, moodGenre) {
-  const res = await fetch(
-    `https://api.spotify.com/v1/recommendations?limit=5&seed_genres=${moodGenre}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+  // 🎧 Gyldige seed-genrer fra Spotify Web API (fast liste)
+// const validSpotifyGenres = [
+//   "pop", "dance", "rock", "metal", "indie", "chill", "study",
+//   "acoustic", "r-n-b", "hip-hop", "electronic", "house", "techno",
+//   "trance", "country", "alternative", "classical", "ambient",
+//   "punk", "soul", "jazz", "latin", "funk"
+// ];
 
-  if (!res.ok) {
-    console.error("Spotify recommendations error:", res.statusText);
+
+
+// Hent "anbefalede" sange baseret på mood ved hjælp af Search API
+export async function fetchSpotifyMoodRecommendations(token, mood) {
+  if (!token) {
+    console.warn("Ingen Spotify-token fundet.");
     return [];
   }
 
-  const data = await res.json();
+  // Hent genre fra dit moodMap
+  const moodMap = {
+    Glad: "pop",
+    Trist: "acoustic",
+    Chill: "chill",
+    Energisk: "dance",
+    Kreativ: "indie",
+    Forelsket: "r-n-b",
+    Fokuseret: "study",
+    Vred: "metal",
+  };
 
-  return data.tracks.map(track => ({
-    id: track.id,
-    title: track.name,
-    artist: track.artists[0]?.name,
-    coverUrl: track.album.images[0]?.url,
-    previewUrl: track.preview_url,
-  }));
+  const genre = moodMap[mood] || "pop";
+
+  try {
+    const randomOffset = Math.floor(Math.random() * 200); // hop tilfældigt i resultaterne
+    const res = await fetch(
+       `https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(genre)}&type=track&limit=5&offset=${randomOffset}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!res.ok) {
+      console.error("Fejl ved Spotify search:", res.status, res.statusText);
+      return [];
+    }
+
+    const data = await res.json();
+
+    if (!data.tracks?.items?.length) {
+      console.warn("Ingen tracks fundet for genre:", genre);
+      return [];
+    }
+
+    // 🎵 Returnér i samme struktur som dine playlist-songs
+    return data.tracks.items.map((track) => ({
+      id: track.id,
+      title: track.name,
+      artist: track.artists.map((a) => a.name).join(", "),
+      imgUrl: track.album.images[0]?.url,
+      previewUrl: track.preview_url,
+      uri: track.uri,
+    }));
+  } catch (err) {
+    console.error("Fejl under hentning af mood-baserede anbefalinger:", err);
+    return [];
+  }
 }
-  
