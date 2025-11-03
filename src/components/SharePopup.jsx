@@ -20,7 +20,7 @@ export default function SharePopup({ onClose }) {
           onDragEnd={(e, info) => {
             if (info.offset.y > 100) onClose();
           }}
-          className="bg-[#23262C] w-full h-[35vh] rounded-t-3xl p-6 text-white relative shadow-[0_-6px_20px_rgba(0,0,0,0.6)]"
+          className="bg-[#1E1E1E] w-full h-[35vh] rounded-t-3xl p-6 text-white relative shadow-[0_-6px_20px_rgba(0,0,0,0.6)]"
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, increment, arrayUnion, arrayRemove, updateDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { fetchSpotifyMoodRecommendations } from "../spotifyApi";
+import { fetchSpotifyRandomRecommendations } from "../spotifyApi";
 
 
 import { ArrowLeft, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp, } from "lucide-react";
@@ -30,6 +31,7 @@ export default function PlaylistView() {
     const [selectedSong, setSelectedSong] = useState(null);
     const isOwnPlaylist = playlist?.userId === auth.currentUser?.uid;
     const [recommendedSongs, setRecommendedSongs] = useState(null);
+    const [toast, setToast] = useState(null);
 
    const origin = location.state?.origin || "unknown";
     const isFeedView = origin === "feed";
@@ -41,51 +43,60 @@ export default function PlaylistView() {
     
 
    const fetchRecommendedSongs = useCallback(async () => {
-    console.log("🔄 fetchRecommendedSongs CALLED");
-  if (!playlist?.mood) return;
+  const token = localStorage.getItem("spotify_access_token");
+  if (!token) return;
 
   try {
-    const token = localStorage.getItem("spotify_access_token");
-    if (!token) {
-      console.warn("Ingen Spotify-token — springer anbefalinger over.");
-      return;
+    let recs = [];
+
+    if (playlist?.mood) {
+      // 🎧 Mood-baseret
+      recs = await fetchSpotifyMoodRecommendations(token, playlist.mood);
+    } else {
+      // 🎲 Tilfældig
+      recs = await fetchSpotifyRandomRecommendations(token);
     }
 
-    const recs = await fetchSpotifyMoodRecommendations(token, playlist.mood);
     setRecommendedSongs(recs);
   } catch (err) {
-    console.error("Kunne ikke hente Spotify-sange:", err);
+    console.error("Kunne ikke hente anbefalinger:", err);
   }
 }, [playlist?.mood]);
 
-  // useEffect der henter anbefalinger når playlist er hentet
-  useEffect(() => {
-    if (showRecommended) {
-      fetchRecommendedSongs();
-    }
-  }, [showRecommended, fetchRecommendedSongs]);
+useEffect(() => {
+  // Vent til playlisten er hentet og loading = false
+  if (!loading && showRecommended && playlist) {
+    fetchRecommendedSongs();
+  }
+}, [loading, showRecommended, playlist, fetchRecommendedSongs]);
 
 
 
-    // fetch playliste fra firebase
+    // fetch playliste fra firebase realtime
     useEffect(() => {
-        const fetchPlaylist = async () => {
-        try {
-            const ref = doc(db, collectionName, id);
-            const snap = await getDoc(ref);
-            if (snap.exists()) {
-            setPlaylist({ id: snap.id, ...snap.data() });
-            } else {
-            console.warn("Ingen playliste fundet med id:", id);
-            }
-        } catch (err) {
-            console.error("Fejl ved hentning:", err);
-        } finally {
-            setLoading(false);
-        }
-        };
-        fetchPlaylist();
-    }, [id, collectionName]);
+  if (!id) return;
+
+  const ref = doc(db, collectionName, id);
+
+  const unsubscribe = onSnapshot(
+    ref,
+    (snapshot) => {
+      if (snapshot.exists()) {
+        setPlaylist({ id: snapshot.id, ...snapshot.data() });
+      } else {
+        console.warn("Ingen playliste fundet med id:", id);
+      }
+      setLoading(false);
+    },
+    (err) => {
+      console.error("Realtime fejl:", err);
+      setLoading(false);
+    }
+  );
+
+  // ryd op når man forlader siden
+  return () => unsubscribe();
+}, [id, collectionName]);
 
 
     // fetch kommentarer i realtime
@@ -128,10 +139,35 @@ export default function PlaylistView() {
         checkIfSaved();
     }, [playlist]);
 
+    // useeffect til at hente playlister fra feed
+    useEffect(() => {
+  const fetchFullPlaylist = async () => {
+    if (!isFeedView || !playlist?.playlistId) return;
+
+    const ref = doc(db, "playlists", playlist.playlistId);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      setPlaylist((prev) => ({ ...prev, ...snap.data() }));
+    }
+  };
+
+  fetchFullPlaylist();
+}, [isFeedView, playlist?.playlistId]);
 
     // check om playliste er loadet/fundet
     if (loading) return <p className="loading">Indlæser playliste...</p>;
     if (!playlist) return <p className="not-found">Ingen playliste fundet.</p>;
+    // 🧠 Ensret data fra feed-posts, så det matcher playlist-strukturen
+    if (isFeedView && !playlist.songs) {
+    playlist.songs = [{
+        id: 1,
+        title: playlist.song || playlist.songName || playlist.name || "Ukendt sang",
+        artist: playlist.artist || playlist.artistName || playlist.username || playlist.user || "Ukendt kunstner",
+        imgUrl: playlist.imgUrl,
+        duration: "3:30"
+    }];
+    }
 
 
    
@@ -250,13 +286,16 @@ export default function PlaylistView() {
             } else {
             await updateDoc(userRef, {
                 playlists: arrayUnion({
-                id: playlist.id,
-                song: playlist.song,
-                user: playlist.user,
-                imgUrl: playlist.imgUrl,
-                name: playlist.name,
+                    id: playlist.id || "",
+                    song: playlist.song || "",
+                    user: playlist.user || playlist.username || "Ukendt bruger",
+                    imgUrl: playlist.imgUrl || "/images/default-cover.png",
+                    name: playlist.name || "Ukendt titel",
+                    mood: playlist.mood || null,
+                    type: playlist.type || "unknown",
+                    songsCount: playlist.songs?.length || playlist.songsCount || 0,
                 }),
-            });
+                });
             setIsSaved(true);
             console.log("💾 Tilføjet til bibliotek:", playlist.name);
             }
@@ -290,12 +329,40 @@ export default function PlaylistView() {
         }
     };
 
-    const handleAddSong = async (song) => {
-        const ref = doc(db, "playlists", id);
-        await updateDoc(ref, {
-            songs: arrayUnion(song)
-        });
+  const handleAddSong = async (song) => {
+  const user = auth.currentUser;
+  if (!user) {
+    setToast({ type: "error", message: "Du skal være logget ind for at tilføje sange!" });
+    return;
+  }
+
+  try {
+    const ref = doc(db, "playlists", id);
+    const newSong = {
+      id: song.id,
+      title: song.title,
+      artist: song.artist,
+      imgUrl: song.imgUrl,
+      previewUrl: song.previewUrl || null,
+      addedBy: user.displayName || user.email.split("@")[0],
+      addedAt: new Date().toISOString(),
     };
+
+    await updateDoc(ref, { songs: arrayUnion(newSong) });
+
+    // 🎯 Fjern den tilføjede sang fra anbefalingerne
+    setRecommendedSongs((prev) => prev.filter((s) => s.id !== song.id));
+
+    setToast({ type: "success", message: `Tilføjede "${song.title}"` });
+  } catch (err) {
+    console.error("Fejl ved tilføjelse af sang:", err);
+    setToast({ type: "error", message: "Kunne ikke tilføje sangen" });
+  }
+
+  // Fjern toast efter 2 sek.
+  setTimeout(() => setToast(null), 2000);
+};
+
 
     return(
         <div className="playlist-view">
@@ -317,21 +384,16 @@ export default function PlaylistView() {
                     <h1 className="playlist-name">{playlist.name || playlist.song}</h1>
                     <h2 className="mood">{playlist.mood || ""}</h2>
                     <p className="user-line">
-                        {playlist.userPhoto ? (
-                            <img
-                            src={playlist.userPhoto}
-                            alt={playlist.user || "Ukendt bruger"}
+                       {playlist.userPhoto ? (
+                        <img
+                            src={playlist.userPhoto || "/images/default-avatar.png"}
+                            alt={playlist.username || playlist.user || "Ukendt bruger"}
                             className="user-avatar"
-                            onError={(e) => {
-                                // fallback hvis billedet ikke findes eller fejler
-                                e.currentTarget.style.display = "none";
-                                e.currentTarget.nextSibling.style.display = "flex";
-                            }}
-                            />
+                        />
                         ) : null}
 
                         <span className="user-name">
-                        {playlist.username || "Ukendt bruger"}
+                        {playlist.username || playlist.user || "Ukendt bruger"}
                         </span>
                     </p>
                 </div>
@@ -367,7 +429,9 @@ export default function PlaylistView() {
                     {songs.map((song) => (
                         <div key={song.id} className="playlist-song">
                             <div className="song-info">
-                            <img src={playlist.imgUrl} alt="Cover" />
+                            <img src={song.imgUrl || playlist.imgUrl || "/images/default-cover.png"}
+                            alt={song.title || "Sangcover"}
+                            onError={(e) => (e.currentTarget.src = "/images/default-cover.png")} />
                             <div className="song-text">
                                 <p className="song-title">{song.title}</p>
                                 <p className="song-artist">{song.artist}</p>
@@ -437,7 +501,7 @@ export default function PlaylistView() {
                         comments.map((c) => (
                         <div key={c.id} className="comment">
                             <img
-                            src={c.userPhoto || "/img/default-avatar.png"}
+                            src={c.photoURL|| "/images/default-avatar.png"}
                             alt={c.username}
                             className="comment-avatar"
                             />
@@ -500,6 +564,17 @@ export default function PlaylistView() {
                     playlist={playlist}
                     onClose={() => setPopupType(null)}
                 />
+                )}
+
+            {toast && (
+                <div
+                    className={`fixed bottom-20 left-1/2 transform -translate-x-1/2 px-5 py-3 rounded-xl text-sm font-medium shadow-lg 
+                    transition-all duration-500 ease-out 
+                    ${toast ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}
+                    ${toast.type === "success" ? "bg-green-500/90" : "bg-red-500/90"} text-white`}
+                    >
+                    {toast.message}
+                    </div>
                 )}
             <FooterNav />
         </div>

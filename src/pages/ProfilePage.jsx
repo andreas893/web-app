@@ -188,10 +188,10 @@ export default function ProfilePage() {
 
       {/* 📌 Pinned */}
       <div className="pinned">
-        <div className="pinned-heading">
+        <div className="pinned-heading" onClick={() => navigate("/pinned")}>
           <h2>Pinned</h2>
           {isOwnProfile && (
-            <ArrowRight onClick={() => navigate("/pinned")} className="cursor-pointer" />
+            <ArrowRight className="cursor-pointer" />
           )}
         </div>
 
@@ -214,10 +214,10 @@ export default function ProfilePage() {
 
       {/* 🏅 Badges – vis for alle, men pil kun for egen profil */}
       <div className="badges-section">
-        <div className="badges-heading">
+        <div className="badges-heading" onClick={() => navigate("/badges")}>
           <h2>Badges og Achievements</h2>
           {isOwnProfile && (
-            <ArrowRight onClick={() => navigate("/badges")} className="cursor-pointer" />
+            <ArrowRight className="cursor-pointer" />
           )}
         </div>
 

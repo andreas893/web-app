@@ -10,8 +10,8 @@ export default function LandingPage() {
         <div className="logo-header">
           <img src="/images/chord-logo.png" alt="Chord logo" />
         </div>
-        <SoundForYou />
         <Feed />
+        <SoundForYou />
         <Wrapped />
       </main>
       <FooterNav />

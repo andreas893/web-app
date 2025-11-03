@@ -301,7 +301,7 @@ const handleDeletePost = async (postId) => {
           return (
             <div
               key={post.id}
-              className="flex-shrink-0 w-[220px] bg-[#1E1E1E] rounded-[18px] overflow-hidden cursor-pointer relative"
+              className="feed-card flex-shrink-0 w-[220px] bg-[#1E1E1E] rounded-[18px] overflow-hidden cursor-pointer relative"
               onClick={() =>
                 navigate(`/playlist/${post.id}`, {
                   state: { origin: "feed" },

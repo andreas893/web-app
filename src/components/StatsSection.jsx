@@ -61,9 +61,9 @@ export default function StatsSection() {
 
   return (
     <section className="stats-section">
-      <div className="stats-heading">
+      <div className="stats-heading" onClick={() => navigate("/stats")}>
         <h2>Statistikker</h2>
-        <ArrowRight onClick={() => navigate("/stats")} />
+        <ArrowRight />
       </div>
 
       <div className="stats-grid">
@@ -72,7 +72,7 @@ export default function StatsSection() {
           <h3>Lytteaktivitet pr. uge</h3>
           <ResponsiveContainer width="100%" height={100}>
             <LineChart data={weeklyActivity}>
-              <Line type="monotone" dataKey="minutes" stroke="#000" strokeWidth={2} dot={false}   isAnimationActive={false} />
+              <Line type="monotone" dataKey="minutes" stroke="#E0E0E0" strokeWidth={2} dot={false}   isAnimationActive={false} />
               <XAxis dataKey="day" hide />
               <YAxis hide />
              <Tooltip
@@ -82,16 +82,16 @@ export default function StatsSection() {
                     border: "1px solid rgba(255,255,255,0.15)",
                     borderRadius: "10px",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-                    color: "#fff",
+                    color: "#E0E0E0",
                     padding: "0.6rem 0.8rem",
                     fontSize: "0.8rem",
                 }}
                 itemStyle={{
-                    color: "#FFD633",
+                    color: "#E0E0E0",
                     fontWeight: 500,
                 }}
                 labelStyle={{
-                    color: "#fff",
+                    color: "#E0E0E0",
                     fontWeight: 600,
                     marginBottom: "0.25rem",
                 }}
@@ -179,7 +179,7 @@ export default function StatsSection() {
           <h3>Lytteaktivitet pr. time</h3>
           <ResponsiveContainer width="100%" height={100}>
             <LineChart data={hourlyListening}>
-              <Line type="monotone" dataKey="plays" stroke="#000" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="plays" stroke="#E0E0E0" strokeWidth={2} dot={false} />
               <XAxis dataKey="hour" hide />
               <YAxis hide />
                <Tooltip

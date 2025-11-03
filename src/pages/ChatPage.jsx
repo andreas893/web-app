@@ -199,7 +199,7 @@ export default function ChatPage() {
               >
                 <div
                   className={`relative rounded-2xl px-4 py-2 text-[15px] leading-snug ${
-                    isMe ? "bg-purple-600" : "bg-gray-800"
+                    isMe ? "bg-[#4D00FF]" : "bg-gray-800"
                   }`}
                 >
                   {/* REDIGER-TILSTAND */}
@@ -356,7 +356,7 @@ export default function ChatPage() {
         />
 
         <button onClick={handleSendText}>
-          <Send className="w-6 h-6 text-purple-500" />
+          <Send className="w-6 h-6 text-[#4D00FF]" />
         </button>
       </div>
 

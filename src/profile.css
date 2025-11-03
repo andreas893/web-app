@@ -4,7 +4,7 @@
   --bg: #121212;
   --text-color: #E0E0E0;
   --primary-color: #4D00FF;
-  --tetriary-color:#23262C;
+  --tetriary-color:#1E1E1E;
   --font-size-p:1.2rem;
   --font-size-med:1.4rem;
   --font-size-h2:1.6rem;
@@ -102,6 +102,12 @@ body {
   align-self: flex-start;
 }
 
+.follow-btn{
+  background-color: #1E1E1E;
+  border-radius: 18px;
+  padding: 0.1rem 0.6rem;
+}
+
 
 
 /* Styling af pinned */
@@ -115,8 +121,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-   border-top: 1px solid var(--text-color);
-  border-bottom: 1px solid var(--text-color);
 }
 
 .pinned-heading h2 {
@@ -164,7 +168,7 @@ body {
 .pinned-card p {
   font-size: 0.8rem;
   font-weight: 500;
-  color: #fff;
+  color: var(--text-color);
   opacity: 0.9;
   margin-top: 0.2rem;
   overflow: hidden;
@@ -184,8 +188,6 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-   border-top: 1px solid var(--text-color);
-  border-bottom: 1px solid var(--text-color);
 }
 
 .stats-heading h2{
@@ -242,28 +244,28 @@ body {
 }
 
 .stat-card.green {
-  background-color: #b5ff9c;
-  color: var(--tetriary-color);
+  background-color: #1E1E1E;
+  color: var(--text-color);
 }
 
 .stat-card.dark {
-  background-color: #0f0f0f;
+  background-color:#1E1E1E;
   color: var(--text-color);
 }
 
 .stat-card.blue {
-  background-color: #92b7ff;
-  color: var(--tetriary-color);
+  background-color: #1E1E1E;
+  color: var(--text-color);
 }
 
 .stat-card.yellow {
-  background-color: #fff585;
-  color: var(--tetriary-color);
+  background-color: #1E1E1E;
+  color: var(--text-color);
 }
 
 .stat-card.pink {
-  background-color: #ffb6e3;
-  color: var(--tetriary-color);
+  background-color: #1E1E1E;
+  color: var(--text-color);
 }
 
 /* styling af badges */
@@ -276,8 +278,6 @@ body {
 }
 
 .badges-heading {
-   border-top: 1px solid var(--text-color);
-  border-bottom: 1px solid var(--text-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -292,7 +292,7 @@ body {
 
 /* --- Card layout --- */
 .badge-card {
-  background-color: #1c1e23;
+  background-color: #1E1E1E;
   border-radius: 20px;
   padding: 1rem;
   text-align: center;
