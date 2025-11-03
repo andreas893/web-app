@@ -13,7 +13,7 @@ export default function SongSharedConfirmation() {
         Sangen er nu delt med dit netværk
       </p>
       <button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
         className="bg-white text-black font-semibold py-2 px-6 rounded-full shadow-lg hover:scale-105 transition"
       >
         Tilbage til forsiden

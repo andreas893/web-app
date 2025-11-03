@@ -41,6 +41,7 @@ export default function MoodPage() {
       const newPlaylist = {
         userId: user.uid,
         user: user.displayName || user.email.split("@")[0],
+        userPhoto: user.photoURL || "/images/default-avatar.png",
         name: name?.trim() || `${selectedMood} Moodlist`,
         mood: selectedMood,
         type: "mood",
@@ -65,6 +66,7 @@ export default function MoodPage() {
           id: docRef.id,
           name: newPlaylist.name,
           user: newPlaylist.user,
+          userPhoto: user.photoURL || "/images/default-avatar.png",
           imgUrl: newPlaylist.imgUrl,
           mood: newPlaylist.mood,
           type: newPlaylist.type,

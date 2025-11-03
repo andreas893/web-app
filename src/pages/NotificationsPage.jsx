@@ -42,7 +42,7 @@ export default function NotificationsPage() {
 
       {/* Filter pill */}
       <div className="flex justify-center mt-4">
-        <button className="bg-purple-600 text-white font-medium py-1.5 px-6 rounded-full text-sm">
+        <button className="bg-[#4D00FF] text-white font-medium py-1.5 px-6 rounded-full text-sm">
           Aktivitet
         </button>
       </div>

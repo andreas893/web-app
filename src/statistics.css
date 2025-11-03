@@ -78,7 +78,7 @@ background-color: var(--bg);
     white-space: nowrap;   
   border: none;
   color: var(--tetriary-color);
-  transition: color 0.3s ease;
+  transition: color 1s ease;
   border-radius: 18px;
   padding: 0.5rem 2rem;
 }

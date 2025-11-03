@@ -4,7 +4,7 @@
   --bg: #121212;
   --text-color: #E0E0E0;
   --primary-color: #4D00FF;
-  --tetriary-color:#23262C;
+  --tetriary-color:#1E1E1E;
   --font-size-p:1.2rem;
   --font-size-med:1.4rem;
   --font-size-h2:1.6rem;
@@ -46,16 +46,21 @@ body {
 }
 
 /* Styling af librarynav knapper */
-.library-nav button{
-    background-color: var(--text-color);
-    border-radius: 18px;
-    color: var(--tetriary-color);
-    padding: 0 1.2rem;
-    margin-right: 1rem;
+
+.library-nav button {
+  background-color: var(--text-color);
+  border-radius: 18px;
+  color: var(--tetriary-color);
+  padding: 0 1.2rem;
+  margin-right: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease;
 }
 
-.library-nav button.active{
-    background-color: var(--primary-color);
+/* Lille bounce ved klik */
+.library-nav button.active {
+  transform: scale(0.92);
+   background-color: var(--primary-color);
     color: var(--text-color);
 }
 
@@ -91,7 +96,7 @@ body {
 .library-playlist-card {
   display: flex;
   align-items: center;
-  background: var(--tetriary-color);
+  background-color: #1E1E1E;
   border-radius: 18px;
   padding: 0.6rem;
   gap: 1rem;
@@ -132,6 +137,7 @@ body {
 }
 
 
+
 .playlist-list.grid img.cover {
   width: 100%;
   height: 140px;
@@ -151,6 +157,7 @@ body {
     align-items: center;
     gap: 0.5rem;
     font-size: var(--font-size-med);
+    
 }
 .create-playlist-btn span{
     background-color: var(--primary-color);
@@ -178,7 +185,7 @@ body {
 
 .popup-container {
   width: 100%;
-  background-color:var(--tetriary-color);
+  background-color:#1E1E1E;
   border-top-left-radius: 18px;
   border-top-right-radius: 18px;
   padding: 1.5rem 1rem 2rem;
@@ -262,7 +269,7 @@ body {
   position: absolute;
   right: 1rem;
   top: 3rem;
-  background-color: var(--tetriary-color);
+  background-color: #1E1E1E;
   border-radius: 10px;
   padding: 0.6rem 0;
   display: flex;
@@ -373,7 +380,7 @@ body {
 }
 
 .confirm-popup {
-  background-color: var(--tetriary-color);
+  background-color:#1E1E1E;
   border-radius: 18px;
   padding: 2rem 1.5rem;
   text-align: center;

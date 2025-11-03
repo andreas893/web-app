@@ -117,7 +117,7 @@ export default function MoodPlaylistPage() {
   }
 
   return (
-    <div className="bg-[#121212] text-white min-h-screen px-4 py-6 font-inter relative">
+    <div className="bg-[#121212] text-[#E0E0E0] min-h-screen px-4 py-6 font-inter relative">
       {/* 🔙 Tilbagepil */}
       <button
         onClick={() => navigate(-1)}

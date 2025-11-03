@@ -36,7 +36,7 @@ useEffect(() => {
 }, []);
 
 
-// ✅ Helper til at hente brugerinfo sikkert (så vi slipper for at gentage os)
+// Helper til at hente brugerinfo sikkert
 const getUserInfo = () => {
   if (!currentUser) return null;
   return {
@@ -45,7 +45,7 @@ const getUserInfo = () => {
       currentUser.displayName ||
       currentUser.email?.split("@")[0] ||
       "Ukendt bruger",
-    userPhoto: currentUser.photoURL || "/img/default-avatar.png",
+    userPhoto: currentUser.photoURL || "/images/default-avatar.png",
   };
 };
   // tjek om playliste/sang er pinned
@@ -57,7 +57,7 @@ const getUserInfo = () => {
     const snap = await getDoc(userRef);
     if (snap.exists()) {
       const pinned = snap.data().pinned || [];
-      // her er forskellen ↓
+     
       const isThisPinned = pinned.some((p) => p.id === playlist.id);
       setIsPinned(isThisPinned);
     }
@@ -68,7 +68,7 @@ const getUserInfo = () => {
   // Luk ved klik udenfor
  useEffect(() => {
   const handleClickOutside = (e) => {
-    if (showConfirm) return; // 🚫 Deaktivér når confirm vises
+    if (showConfirm) return; //  Deaktivér når confirm vises
     if (popupRef.current && !popupRef.current.contains(e.target)) {
       onClose();
     }
@@ -115,7 +115,7 @@ const getUserInfo = () => {
             ? playlist.imgUrl
             : typeof playlist.image === "string" && playlist.image.trim() !== ""
             ? playlist.image
-            : "/img/fallback.jpg"; // fallback kun hvis begge er tomme
+            : "/images/default-cover.png"; // fallback kun hvis begge er tomme
 
         // find korrekt brugernavn
        const resolvedUser = getUserInfo();
@@ -192,12 +192,10 @@ const handleShare = async () => {
 
   const { userId, username, userPhoto } = info;
 
-  // 🔹 Definér standardcover
-  const DEFAULT_COVER = "/img/default-cover.png"; // Sørg for at dette findes i /public/img/
+
 
   // 🔹 Brug uploaded billede hvis muligt, ellers fallback
-  const finalCover =
-    typeof cover === "string" && cover.trim() !== "" ? cover : DEFAULT_COVER;
+    const finalCover = (typeof cover === "string" && cover.trim() !== "") ? cover : null;
 
   // 🔹 Opret nyt playlist-objekt
   const newPlaylist = {
@@ -297,7 +295,7 @@ const handleDelete = async () => {
       console.log("🧹 Fjernet fra brugerprofil:", playlist.id);
     }
 
-    alert(`🗑️ '${playlist.name}' er slettet.`);
+
     setShowConfirm(false);
     onClose();
   } catch (err) {

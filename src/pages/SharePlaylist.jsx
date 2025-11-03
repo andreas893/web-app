@@ -49,16 +49,20 @@ export default function SharePlaylist() {
     const playlist = playlists[selected];
 
     try {
-      await addDoc(collection(db, "posts"), {
-        type: "playlist",
-        playlistId: playlist.id || null,
-        playlistName: playlist.name || "Ukendt navn",
-        imgUrl: playlist.imgUrl || playlist.coverUrl || "",
-        userId: user.uid,
-        username: user.displayName || user.email.split("@")[0],
-        comment: comment.trim(),
-        timestamp: serverTimestamp(),
-      });
+     await addDoc(collection(db, "posts"), {
+    type: "playlist",                              
+    playlistId: playlist.id || null,               // reference til den fulde playliste
+    name: playlist.name || playlist.playlistName || "Ukendt navn",
+    imgUrl: playlist.imgUrl || playlist.coverUrl || "", 
+    mood: playlist.mood || null,                   
+    songsCount: playlist.songs?.length || 0,     
+    userId: user.uid,
+    username: user.displayName || user.email.split("@")[0],
+    userPhoto: user.photoURL || "/images/default-avatar.png",  // så profilbillede vises i feed
+    comment: comment?.trim() || "",                // evt. caption når man deler
+    timestamp: serverTimestamp(),
+  });
+
 
       // ✅ Navigér til confirmation-side
       navigate("/playlist-shared");
@@ -95,7 +99,7 @@ export default function SharePlaylist() {
                 className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition ${
                   selected === i
                     ? "bg-[#4D00FF]"
-                    : "bg-[#23262C] hover:bg-[#2A2A2A]"
+                    : "bg-[#1E1E1E] hover:bg-[#2A2A2A]"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -117,9 +121,6 @@ export default function SharePlaylist() {
                     <p className="font-semibold text-sm">
                       {pl.name || "Ukendt titel"}
                     </p>
-                    <p className="text-gray-400 text-xs">
-                      {pl.tracks?.length || 0} sange
-                    </p>
                   </div>
                 </div>
                 {selected === i && <Check size={20} className="text-white" />}
@@ -135,7 +136,7 @@ export default function SharePlaylist() {
           placeholder="Skriv kommentar..."
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          className="w-full bg-[#23262c] text-white placeholder-gray-400 text-sm rounded-2xl p-3 outline-none resize-none h-20 mb-3"
+          className="w-full bg-[#1E1E1E] text-white placeholder-gray-400 text-sm rounded-2xl p-3 outline-none resize-none h-20 mb-3"
         ></textarea>
 
         <button
