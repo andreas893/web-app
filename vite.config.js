@@ -8,7 +8,7 @@ export default defineConfig(({ command }) => {
     base: "/",
     server: {
       host: true,     // 👈 tillad adgang udefra (viser din lokale IP)
-      port: 5173,     // 👈 vælg den port Spotify-redirecten peger på
+      port: 5173,     
     },
   };
 
