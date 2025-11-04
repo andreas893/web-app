@@ -146,8 +146,9 @@ body {
     margin-top: 1rem;
 }
 
-.tilmeld-tekst a{
+.tilmeld-tekst button{
     text-decoration: underline 3px solid #e0e0e0;
+    padding-left: 0.5rem;
 }
 
 /* opret side */

@@ -11,7 +11,7 @@ export default function LandingPage() {
     <div className="bg-[#121212] min-h-screen flex flex-col font-inter relative">
       <main className="flex-1 pb-20 overflow-y-auto hide-scroll px-4">
         <div className="logo-header">
-          <img src="/images/chord-logo.png" alt="Chord logo" />
+        <img src={`${import.meta.env.BASE_URL}images/chord-logo.png`} alt="Chord logo" />
            <button onClick={() => setPopupType("create")} className="create-playlist-btn landing-btn">
            <span>＋</span>
              </button>

@@ -153,7 +153,7 @@ export default function Login() {
      <div className="login-page">
       
       <div className="logo">
-         <div className="logo-img"><img src="/images/chord-logo.png" alt="Chord logo" /></div>
+         <div className="logo-img"><img src={`${import.meta.env.BASE_URL}images/chord-logo.png`} alt="Chord logo" /></div>
          <h2>Log ind på chord</h2>
       </div>
        
@@ -200,11 +200,15 @@ export default function Login() {
         {error && <p className="error">{error}</p>}
 
         <p className="tilmeld-tekst">
-          Har du ikke en konto?{" "}
-          <a href="/signup">
-            Tilmeld dig her
-          </a>
+          Har du ikke en konto?
+          <button
+          onClick={() => navigate("/signup")}
+          className="signup-link"
+        >
+          Tilmeld dig her
+        </button>
         </p>
+        
       </div>
      
     </div>
