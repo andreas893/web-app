@@ -274,7 +274,7 @@ const handleDeletePost = async (postId) => {
 
 
   return (
-    <section className="mt-8">
+    <section className="mt-4">
       <h2 className="text-lg font-bold mb-3">Feed</h2>
 
       <div className="flex gap-4 overflow-x-auto hide-scroll">
