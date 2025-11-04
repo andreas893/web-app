@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { doc, updateDoc, addDoc, collection, serverTimestamp, arrayUnion } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import CreatePlaylistDetailsPopup from "../components/DetailsPopup";
+import { getImageUrl } from "../utils/getImageUrl";
 import "../moodPage.css";
 
 const moods = [
@@ -41,11 +42,11 @@ export default function MoodPage() {
       const newPlaylist = {
         userId: user.uid,
         user: user.displayName || user.email.split("@")[0],
-        userPhoto: user.photoURL || "/images/default-avatar.png",
+        userPhoto: user.photoURL || getImageUrl("images/default-avatar.png"),
         name: name?.trim() || `${selectedMood} Moodlist`,
         mood: selectedMood,
         type: "mood",
-        imgUrl: cover || "/img/mood-cover.jpg",
+        imgUrl: cover || getImageUrl("images/default-cover.png"),
         songs: [
           { id: 1, title: "Evening Reflections", artist: "Soft Haze", duration: "3:42" },
           { id: 2, title: "Waves of Calm", artist: "Lucid Dreams", duration: "4:10" },
@@ -66,7 +67,7 @@ export default function MoodPage() {
           id: docRef.id,
           name: newPlaylist.name,
           user: newPlaylist.user,
-          userPhoto: user.photoURL || "/images/default-avatar.png",
+          userPhoto: user.photoURL || getImageUrl("images/default-avatar.png"),
           imgUrl: newPlaylist.imgUrl,
           mood: newPlaylist.mood,
           type: newPlaylist.type,

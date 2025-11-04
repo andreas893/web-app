@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import CreatePlaylistPopup from "../components/CreatePlaylistPopup";
 import { LayoutGrid, List, EllipsisVertical } from "lucide-react"
 import "../library.css";
+import { getImageUrl } from "../utils/getImageUrl";
 
 export default function LibraryPage() {
      const [activeTab, setActiveTab] = useState(null);
@@ -141,7 +142,7 @@ export default function LibraryPage() {
          <div className={`playlist-list ${viewMode}`}>
         {filteredPlaylists.map((playlist) => (
           <div key={playlist.id} className="library-playlist-card" onClick={() => navigate(`/playlist/${playlist.id}`, { state: { origin: "library" } })}>
-            <img  src={playlist.imgUrl || "/images/default-cover.png"} alt={playlist.name} onError={(e) => (e.currentTarget.src = "/images/default-cover.png")} className="cover" />
+            <img  src={playlist.imgUrl || getImageUrl("images/default-cover.png")} alt={playlist.name} onError={(e) => (e.currentTarget.src = getImageUrl("images/default-cover.png"))} className="cover" />
             
             <div className="info">
               <h3>{playlist.name}</h3>

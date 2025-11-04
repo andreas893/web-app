@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import "../login.css";
+import { getImageUrl } from "../utils/getImageUrl";
 
 const Opret = () => {
     const [email, setEmail] = useState("");
@@ -24,7 +25,7 @@ const Opret = () => {
           userId: user.uid,
           email: user.email,
           username: username.trim().toLowerCase(),
-          photoURL: "/images/default-avatar.png", // fallback
+          photoURL: getImageUrl("images/default-avatar.png"), // fallback
           createdAt: new Date(),
 
           // Social struktur

@@ -19,6 +19,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import DeleteConfirmPopup from "./DeleteConfirmPopup";
+import { getImageUrl } from "../utils/getImageUrl";
 
 export default function Feed() {
   const [feed, setFeed] = useState([]);
@@ -282,7 +283,7 @@ const handleDeletePost = async (postId) => {
           const post = {
             id: postRaw.id,
             imgUrl:
-              postRaw.imgUrl || postRaw.image || "/images/default-cover.png",
+              postRaw.imgUrl || postRaw.image || getImageUrl("images/default-cover.png"),
             song:
               postRaw.song ||
               postRaw.songName ||
@@ -293,7 +294,7 @@ const handleDeletePost = async (postId) => {
               postRaw.userName ||
               postRaw.user ||
               "Ukendt bruger",
-            userPhoto: postRaw.userPhoto || "/images/default-avatar.png",
+            userPhoto: postRaw.userPhoto || getImageUrl("images/default-avatar.png"),
             name: postRaw.name || postRaw.playlistName || "Ukendt titel",
             userId: postRaw.userId,
           };

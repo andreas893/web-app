@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { X, Check } from "lucide-react";
 import { auth, db } from "../firebase";
 import { doc, onSnapshot, addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { getImageUrl } from "../utils/getImageUrl";
 
 export default function SharePlaylist() {
   const [playlists, setPlaylists] = useState([]);
@@ -58,7 +59,7 @@ export default function SharePlaylist() {
     songsCount: playlist.songs?.length || 0,     
     userId: user.uid,
     username: user.displayName || user.email.split("@")[0],
-    userPhoto: user.photoURL || "/images/default-avatar.png",  // så profilbillede vises i feed
+    userPhoto: user.photoURL || getImageUrl("images/default-avatar.png"),  // så profilbillede vises i feed
     comment: comment?.trim() || "",                // evt. caption når man deler
     timestamp: serverTimestamp(),
   });
@@ -109,10 +110,10 @@ export default function SharePlaylist() {
                         ? pl.imgUrl
                         : pl.coverUrl?.trim()
                         ? pl.coverUrl
-                        : "/images/default-cover.png"
+                        : getImageUrl("images/default-cover.png")
                     }
                     onError={(e) =>
-                      (e.currentTarget.src = "/images/default-cover.png")
+                      (e.currentTarget.src = getImageUrl("images/default-cover.png"))
                     }
                     alt={pl.name || "Playliste"}
                     className="w-[80px] h-[80px] rounded-[18px] object-cover"

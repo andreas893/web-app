@@ -5,6 +5,7 @@ import { loginWithSpotify, getSpotifyToken } from "../spotifyAuthPKCE";
 import { auth, db } from "../firebase";
 import { collection, query, where, getDocs, doc, setDoc, getDoc } from "firebase/firestore";
 import "../login.css";
+import { getImageUrl } from "../utils/getImageUrl";
 import { FaSpotify } from "react-icons/fa";
 import { AiFillGoogleCircle } from "react-icons/ai";
 import { FaFacebook } from "react-icons/fa";
@@ -21,7 +22,7 @@ async function ensureUserDocument(user) {
     await setDoc(userRef, {
       userId: user.uid,
       username: user.displayName || user.email?.split("@")[0] || "Ukendt bruger",
-      photoURL: user.photoURL || "/images/default-avatar.png",
+      photoURL: user.photoURL || getImageUrl("images/default-avatar.png"),
       email: user.email || "",
       createdAt: new Date().toISOString(),
       playlists: [],
@@ -34,7 +35,7 @@ async function ensureUserDocument(user) {
 
     // Tilføj manglende felter til ældre brugere
     if (!data.userId) updates.userId = user.uid;
-    if (!data.photoURL) updates.photoURL = "/images/default-avatar.png";
+    if (!data.photoURL) updates.photoURL = getImageUrl("images/default-avatar.png");
     if (!data.username)
       updates.username = user.displayName || user.email?.split("@")[0];
 

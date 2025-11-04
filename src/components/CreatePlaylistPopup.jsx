@@ -6,6 +6,7 @@ import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import DetailsPopup from "../components/DetailsPopup"
 import { useNavigate } from "react-router";
+import { getImageUrl } from "../utils/getImageUrl";
 
 export default function CreatePlaylistPopup({ type = "create", onClose, playlist, onShare, context="playlist", song }) {
   const popupRef = useRef(null);
@@ -20,9 +21,9 @@ export default function CreatePlaylistPopup({ type = "create", onClose, playlist
 
 
   const dummyFriends = [
-  { id: "1", name: "Andreas", avatar: "/img/andreas.jpg" },
-  { id: "2", name: "Mathias", avatar: "/img/mathias.jpg" },
-  { id: "3", name: "Sofie", avatar: "/img/sofie.jpg" },
+  { id: "1", name: "Andreas", avatar: getImageUrl("images/default-avatar.png") },
+  { id: "2", name: "Mathias", avatar: getImageUrl("images/default-avatar.png") },
+  { id: "3", name: "Sofie", avatar: getImageUrl("images/default-avatar.png") },
 ];
 
 console.log("Origin:", location.state);
@@ -45,7 +46,7 @@ const getUserInfo = () => {
       currentUser.displayName ||
       currentUser.email?.split("@")[0] ||
       "Ukendt bruger",
-    userPhoto: currentUser.photoURL || "/images/default-avatar.png",
+    userPhoto: currentUser.photoURL || getImageUrl("images/default-avatar.png"),
   };
 };
   // tjek om playliste/sang er pinned
@@ -115,7 +116,7 @@ const getUserInfo = () => {
             ? playlist.imgUrl
             : typeof playlist.image === "string" && playlist.image.trim() !== ""
             ? playlist.image
-            : "/images/default-cover.png"; // fallback kun hvis begge er tomme
+            : getImageUrl("images/default-cover.png"); // fallback kun hvis begge er tomme
 
         // find korrekt brugernavn
        const resolvedUser = getUserInfo();

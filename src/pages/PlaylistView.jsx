@@ -5,7 +5,7 @@ import { doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimest
 import { db, auth } from "../firebase";
 import { fetchSpotifyMoodRecommendations } from "../spotifyApi";
 import { fetchSpotifyRandomRecommendations } from "../spotifyApi";
-
+import { getImageUrl } from "../utils/getImageUrl";
 
 import { ArrowLeft, PlayIcon, ShuffleIcon, Bookmark, Heart, MessageCircle, RefreshCcwIcon, CirclePlus, EllipsisVertical, ArrowUp, } from "lucide-react";
 import "../playlistView.css";
@@ -198,7 +198,7 @@ useEffect(() => {
                 text: newComment,  // selve kommentarteksten
                 userId: user.uid,  // ID på brugeren der kommenterede
                 username: user.displayName || user.email.split("@")[0], // brugernavn
-                userPhoto: user.photoURL || "/img/default-avatar.png", // profilbillede
+                userPhoto: user.photoURL || getImageUrl("images/default-avatar.png"), // profilbillede
                 postOwnerId: playlist.userId || "ukendt", // ejeren af playlisten (til evt. notifikationer)
                 likes: 0,  // antal likes
                 likedBy: [], // hvem der har liket
@@ -289,7 +289,7 @@ useEffect(() => {
                     id: playlist.id || "",
                     song: playlist.song || "",
                     user: playlist.user || playlist.username || "Ukendt bruger",
-                    imgUrl: playlist.imgUrl || "/images/default-cover.png",
+                    imgUrl: playlist.imgUrl || getImageUrl("images/default-cover.png"),
                     name: playlist.name || "Ukendt titel",
                     mood: playlist.mood || null,
                     type: playlist.type || "unknown",
@@ -386,7 +386,7 @@ useEffect(() => {
                     <p className="user-line">
                        {playlist.userPhoto ? (
                         <img
-                            src={playlist.userPhoto || "/images/default-avatar.png"}
+                            src={playlist.userPhoto || getImageUrl("images/default-avatar.png")}
                             alt={playlist.username || playlist.user || "Ukendt bruger"}
                             className="user-avatar"
                         />
@@ -429,9 +429,9 @@ useEffect(() => {
                     {songs.map((song) => (
                         <div key={song.id} className="playlist-song">
                             <div className="song-info">
-                            <img src={song.imgUrl || playlist.imgUrl || "/images/default-cover.png"}
+                            <img src={song.imgUrl || playlist.imgUrl || getImageUrl("images/default-cover.png")}
                             alt={song.title || "Sangcover"}
-                            onError={(e) => (e.currentTarget.src = "/images/default-cover.png")} />
+                            onError={(e) => (e.currentTarget.src = getImageUrl("images/default-cover.png"))} />
                             <div className="song-text">
                                 <p className="song-title">{song.title}</p>
                                 <p className="song-artist">{song.artist}</p>
@@ -501,7 +501,7 @@ useEffect(() => {
                         comments.map((c) => (
                         <div key={c.id} className="comment">
                             <img
-                            src={c.photoURL|| "/images/default-avatar.png"}
+                            src={c.photoURL|| getImageUrl("images/default-avatar.png")}
                             alt={c.username}
                             className="comment-avatar"
                             />

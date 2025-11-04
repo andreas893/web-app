@@ -5,6 +5,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { loginWithSpotify, getSpotifyToken } from "../spotifyAuthPKCE";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
+import { getImageUrl } from "../utils/getImageUrl";
 
 /**
  * Props fra ChatPage:
@@ -109,10 +110,10 @@ export default function ShareSong({
         type: "song",
         userId: user.uid,
         username: user.displayName || user.email.split("@")[0],
-        userPhoto: user.photoURL || "/images/default-avatar.png",
+        userPhoto: user.photoURL || getImageUrl("images/default-avatar.png"),
         name: selectedSong.name,
         artist: selectedSong.artists.map((a) => a.name).join(", "),
-        imgUrl: selectedSong.album.images[0]?.url || "/images/default-cover.png",
+        imgUrl: selectedSong.album.images[0]?.url || getImageUrl("images/default-cover.png"),
         comment: comment.trim(),
         timestamp: serverTimestamp(),
       });
