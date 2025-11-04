@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../utils/getImageUrl";
 
 export default function WrappedMonth() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function WrappedMonth() {
     },
     {
       title: "Din top sang denne måned var Blinding Lights af The Weeknd",
-      image: "/images/blindinglights.jpg",
+      image: getImageUrl("/images/blindinglights.jpg"),
     },
     {
       title: "Dit humør har ændret sig i løbet af måneden",

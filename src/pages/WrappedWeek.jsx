@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../utils/getImageUrl";
 
 export default function WrappedWeek() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function WrappedWeek() {
     },
     {
       title: "Din top sang denne uge var Practice af Drake",
-      image: "/images/takecare.jpg",
+      image: getImageUrl("/images/takecare.jpg"),
     },
     {
       title: "Dit humør har ændret sig meget i løbet af ugen",
