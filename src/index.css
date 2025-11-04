@@ -52,7 +52,7 @@ body p, a, input, button {
   margin-left: -0.7rem;
 }
 
-.create-playlist-btn{
+.landing-btn{
   display: flex;
   justify-content: flex-end;
 }
