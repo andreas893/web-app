@@ -12,7 +12,7 @@ export default function LandingPage() {
       <main className="flex-1 pb-20 overflow-y-auto hide-scroll px-4">
         <div className="logo-header">
           <img src="/images/chord-logo.png" alt="Chord logo" />
-           <button onClick={() => setPopupType("create")} className="create-playlist-btn">
+           <button onClick={() => setPopupType("create")} className="create-playlist-btn landing-btn">
            <span>＋</span>
              </button>
         </div>
