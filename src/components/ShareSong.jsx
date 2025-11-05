@@ -1,7 +1,7 @@
 // src/components/ShareSong.jsx
 import { useEffect, useState } from "react";
 import { db, auth } from "../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { loginWithSpotify, getSpotifyToken } from "../spotifyAuthPKCE";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
@@ -105,11 +105,17 @@ export default function ShareSong({
       return;
     }
 
+
+    // 🔹 Hent brugerens dokument fra 'users' samlingen
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    const userData = userSnap.exists() ? userSnap.data() : null;
+
     try {
       await addDoc(collection(db, "posts"), {
         type: "song",
         userId: user.uid,
-        username: user.displayName || user.email.split("@")[0],
+        username: userData?.username || user.displayName || user.email.split("@")[0],
         userPhoto: user.photoURL || getImageUrl("images/default-avatar.png"),
         name: selectedSong.name,
         artist: selectedSong.artists.map((a) => a.name).join(", "),
